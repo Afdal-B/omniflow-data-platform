@@ -1,0 +1,28 @@
+# Stratum — local platform. Services are added step by step.
+#   docker compose up -d     start
+#   docker compose down -v   stop and delete the data
+#                            (the next start re-runs the init scripts)
+name: stratum
+
+services:
+  # Operational database of the shop: the batch source of the platform.
+  postgres-oltp:
+    image: postgres:16.4
+    environment:
+      POSTGRES_DB: ${OLTP_DB_NAME}
+      POSTGRES_USER: ${OLTP_DB_USER}
+      POSTGRES_PASSWORD: ${OLTP_DB_PASSWORD}
+    volumes:
+      # Run in alphabetical order, only when the volume is empty.
+      - ./docker/postgres-oltp/init:/docker-entrypoint-initdb.d:ro
+      - oltp-data:/var/lib/postgresql/data
+    ports:
+      - "${OLTP_DB_HOST_PORT:-5433}:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${OLTP_DB_USER} -d ${OLTP_DB_NAME}"]
+      interval: 5s
+      retries: 20
+    restart: unless-stopped
+
+volumes:
+  oltp-data:
