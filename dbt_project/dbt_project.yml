@@ -1,0 +1,31 @@
+name: stratum
+version: "1.0.0"
+profile: stratum
+
+model-paths: ["models"]
+macro-paths: ["macros"]
+test-paths: ["tests"]
+clean-targets: ["target", "dbt_packages"]
+
+vars:
+  session_timeout_minutes: 30
+  revenue_statuses: ["paid", "shipped", "delivered"]
+  finops_vcpu_per_job: 2
+  finops_memory_gb_per_job: 4
+  finops_usd_per_vcpu_hour: 0.052624
+  finops_usd_per_gb_hour: 0.0057785
+
+models:
+  stratum:
+    +persist_docs:
+      relation: true
+      columns: true
+    staging:
+      +schema: staging
+      +materialized: view
+    intermediate:
+      +schema: intermediate
+      +materialized: table
+    marts:
+      +schema: marts
+      +materialized: table

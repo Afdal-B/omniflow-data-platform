@@ -1,0 +1,26 @@
+models:
+  - name: stg_events__clickstream
+    description: Clickstream events as published, renamed. Can contain duplicates.
+    columns:
+      - name: event_id
+        data_tests: [not_null]
+      - name: event_at
+        data_tests: [not_null]
+      - name: event_type
+        data_tests:
+          - accepted_values:
+              arguments:
+                values:
+                  - page_view
+                  - search
+                  - product_view
+                  - add_to_cart
+                  - remove_from_cart
+                  - begin_checkout
+                  - purchase
+
+  - name: stg_events__traffic_5min
+    description: Event counts per 5-minute window, event type and device.
+    columns:
+      - name: window_start
+        data_tests: [not_null]

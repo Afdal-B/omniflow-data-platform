@@ -1,0 +1,13 @@
+extends: default
+
+ignore: |
+  .venv/
+  dbt_project/dbt_packages/
+  dbt_project/target/
+
+rules:
+  document-start: disable
+  line-length:
+    max: 100
+  truthy:
+    check-keys: false

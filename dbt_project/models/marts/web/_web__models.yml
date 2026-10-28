@@ -1,0 +1,28 @@
+models:
+  - name: fct_sessions
+    description: One row per visit, with funnel step counts and the conversion flag.
+    columns:
+      - name: session_id
+        data_tests: [unique, not_null]
+      - name: session_date
+        data_tests:
+          - relationships:
+              arguments:
+                to: ref('dim_date')
+                field: date_day
+      - name: order_id
+        description: Order placed during the visit, if any.
+        data_tests:
+          - relationships:
+              arguments:
+                to: ref('fct_orders')
+                field: order_id
+              config:
+                where: "session_started_at < current_timestamp - interval '3 hours'"
+
+  - name: fct_web_traffic_5min
+    description: Traffic per 5-minute window, event type and device.
+    data_tests:
+      - dbt_utils.unique_combination_of_columns:
+          arguments:
+            combination_of_columns: ["window_start", "event_type", "device"]

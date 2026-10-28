@@ -1,0 +1,36 @@
+models:
+  - name: fct_pipeline_runs
+    description: One row per pipeline run, successful or failed. Feeds the Platform Health page.
+    data_tests:
+      - dbt_utils.unique_combination_of_columns:
+          arguments:
+            combination_of_columns: ["pipeline_name", "batch_id"]
+    columns:
+      - name: estimated_cost_usd
+        description: >
+          Estimated cost of the run on a serverless Spark service (assumed resources and
+          prices in the finops_* project variables). An estimate, not a bill.
+        data_tests:
+          - dbt_utils.accepted_range:
+              arguments:
+                min_value: 0
+      - name: dlq_rate
+        description: Share of the rows read that were sent to the Dead Letter Queue.
+        data_tests:
+          - dbt_utils.accepted_range:
+              arguments:
+                min_value: 0
+                max_value: 1
+
+  - name: fct_pipeline_rejections
+    description: Rows rejected per run and quality rule.
+    data_tests:
+      - dbt_utils.unique_combination_of_columns:
+          arguments:
+            combination_of_columns: ["pipeline_name", "batch_id", "rejection_reason"]
+    columns:
+      - name: rejected_rows
+        data_tests:
+          - dbt_utils.accepted_range:
+              arguments:
+                min_value: 1

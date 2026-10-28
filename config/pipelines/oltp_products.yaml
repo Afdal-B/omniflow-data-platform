@@ -1,0 +1,23 @@
+name: oltp_products
+description: Product catalogue from the shop OLTP database.
+
+orchestration:
+  schedule: "@hourly"
+  retries: 2
+  tags: [batch, oltp]
+
+source:
+  type: jdbc
+  connection: OLTP_DB
+  table: shop.products
+  mode: full
+
+quality:
+  - {check: not_null, column: product_id}
+  - {check: not_null, column: sku}
+  - {check: not_null, column: category}
+  - {check: range, column: unit_price, min: 0}
+
+target:
+  source: oltp
+  dataset: products

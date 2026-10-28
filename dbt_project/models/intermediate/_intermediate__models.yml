@@ -1,0 +1,64 @@
+models:
+  - name: int_oltp__customers_current
+    description: Latest version of each customer.
+    columns:
+      - name: customer_id
+        data_tests: [unique, not_null]
+
+  - name: int_oltp__products_current
+    description: Latest snapshot of each product.
+    columns:
+      - name: product_id
+        data_tests: [unique, not_null]
+
+  - name: int_oltp__order_items_current
+    description: Latest version of each order line, with line amounts.
+    columns:
+      - name: order_item_id
+        data_tests: [unique, not_null]
+
+  - name: int_oltp__orders_enriched
+    description: Latest version of each order, amounts rolled up from its lines, revenue flag.
+    columns:
+      - name: order_id
+        data_tests: [unique, not_null]
+      - name: is_revenue
+        description: True when the status is one of the `revenue_statuses` project variable.
+
+  - name: int_events__clickstream_deduplicated
+    description: One row per event_id (first received copy).
+    columns:
+      - name: event_id
+        data_tests: [unique, not_null]
+
+  - name: int_events__sessionized
+    description: Events with their session (30 minutes of inactivity closes a session).
+    columns:
+      - name: event_id
+        data_tests: [unique, not_null]
+      - name: session_id
+        data_tests: [not_null]
+
+unit_tests:
+  - name: sessionization_splits_after_inactivity_timeout
+    description: >
+      A gap of 30 minutes or more opens a new session; sessions are numbered per visitor and
+      never mix two visitors.
+    model: int_events__sessionized
+    overrides:
+      vars:
+        session_timeout_minutes: 30
+    given:
+      - input: ref('int_events__clickstream_deduplicated')
+        rows:
+          - {event_id: e1, anonymous_id: a1, event_type: page_view, event_at: "2026-01-01 10:00:00"}
+          - {event_id: e2, anonymous_id: a1, event_type: product_view,
+             event_at: "2026-01-01 10:29:00"}
+          - {event_id: e3, anonymous_id: a1, event_type: page_view, event_at: "2026-01-01 10:59:00"}
+          - {event_id: e4, anonymous_id: a2, event_type: page_view, event_at: "2026-01-01 10:30:00"}
+    expect:
+      rows:
+        - {event_id: e1, session_number: 1}
+        - {event_id: e2, session_number: 1}
+        - {event_id: e3, session_number: 2}
+        - {event_id: e4, session_number: 1}

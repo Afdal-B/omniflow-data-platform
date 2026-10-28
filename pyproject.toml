@@ -1,21 +1,41 @@
 [project]
 name = "omniflow-data-platform"
 version = "0.1.0"
-description = "Add your description here"
+description = "Stratum: end-to-end data platform of the OmniFlow shop."
 readme = "README.md"
 requires-python = ">=3.12"
-dependencies = []
+dependencies = [
+    "pydantic>=2.14.1",
+    "pyyaml>=6.0.3",
+]
 
 [project.scripts]
-omniflow-data-platform = "omniflow_data_platform:main"
+stratum-generator = "omniflow_data_platform.generator.__main__:main"
 
 [build-system]
 requires = ["uv_build>=0.12.15,<0.13.0"]
 build-backend = "uv_build"
 
 [dependency-groups]
+airflow = [
+    "apache-airflow==3.3.2",
+    "apache-airflow-providers-docker>=4.5",
+]
+dbt = [
+    "dbt-core~=1.12.6",
+    "dbt-postgres~=1.11.0",
+]
 dev = [
     "pytest>=9.1.1",
     "ruff>=0.17.2",
     "yamllint>=1.38.0",
+]
+generator = [
+    "confluent-kafka>=2.16.0",
+    "faker>=40.43.0",
+    "psycopg[binary]>=3.3.6",
+]
+spark = [
+    "psycopg[binary]>=3.3.6",
+    "pyspark==4.2.1",
 ]

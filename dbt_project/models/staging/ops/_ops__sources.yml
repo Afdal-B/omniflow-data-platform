@@ -1,0 +1,7 @@
+sources:
+  - name: ops
+    description: Operational data of the platform itself, written by the `record_run` task.
+    schema: ops
+    tables:
+      - name: pipeline_runs
+        description: One row per pipeline run (Airflow DAG run), successful or failed.

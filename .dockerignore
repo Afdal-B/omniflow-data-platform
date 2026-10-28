@@ -1,0 +1,15 @@
+.env
+.env.*
+!.env.example
+secrets/
+*.pem
+*.p8
+.git/
+.venv/
+**/__pycache__/
+.pytest_cache/
+.ruff_cache/
+tests/
+dbt_project/target/
+dbt_project/dbt_packages/
+dbt_project/logs/

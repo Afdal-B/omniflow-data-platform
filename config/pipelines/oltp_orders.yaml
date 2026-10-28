@@ -1,0 +1,29 @@
+name: oltp_orders
+description: Order headers from the shop OLTP database.
+
+orchestration:
+  schedule: "@hourly"
+  retries: 2
+  tags: [batch, oltp]
+
+source:
+  type: jdbc
+  connection: OLTP_DB
+  table: shop.orders
+  mode: incremental
+  watermark_column: updated_at
+  lookback_minutes: 10
+
+quality:
+  - {check: not_null, column: order_id}
+  - {check: not_null, column: customer_id}
+  - {check: not_null, column: order_ts}
+  - check: accepted_values
+    column: status
+    values: [pending, paid, shipped, delivered, cancelled, refunded]
+  - {check: accepted_values, column: channel, values: [web, mobile, store]}
+  - {check: regex, column: currency, pattern: '^[A-Z]{3}$'}
+
+target:
+  source: oltp
+  dataset: orders

@@ -1,0 +1,47 @@
+models:
+  - name: stg_oltp__customers
+    description: Customer versions, renamed and normalised. One row per extracted version.
+    columns:
+      - name: customer_id
+        data_tests: [not_null]
+      - name: email
+        description: Lower-cased e-mail. Personal data, never exposed as is beyond this layer.
+        data_tests: [not_null]
+      - name: customer_segment
+        data_tests:
+          - accepted_values:
+              arguments:
+                values: ["consumer", "business"]
+
+  - name: stg_oltp__products
+    description: Product snapshots, one row per product and extraction.
+    columns:
+      - name: product_id
+        data_tests: [not_null]
+      - name: unit_price
+        data_tests:
+          - dbt_utils.accepted_range:
+              arguments:
+                min_value: 0
+
+  - name: stg_oltp__orders
+    description: Order header versions (every status change produces a new version).
+    columns:
+      - name: order_id
+        data_tests: [not_null]
+      - name: order_status
+        data_tests:
+          - accepted_values:
+              arguments:
+                values: ["pending", "paid", "shipped", "delivered", "cancelled", "refunded"]
+
+  - name: stg_oltp__order_items
+    description: Order line versions.
+    columns:
+      - name: order_item_id
+        data_tests: [not_null]
+      - name: quantity
+        data_tests:
+          - dbt_utils.accepted_range:
+              arguments:
+                min_value: 1

@@ -1,0 +1,52 @@
+name: clickstream_events
+description: Web and mobile clickstream events from Kafka.
+
+orchestration:
+  schedule: "*/15 * * * *"
+  retries: 2
+  tags: [streaming, web]
+
+source:
+  type: kafka
+  topic: shop.clickstream.v1
+  starting_offsets: earliest
+  max_offsets_per_trigger: 50000
+  fields:
+    - {name: event_id, type: string}
+    - {name: event_type, type: string}
+    - {name: event_ts, type: timestamp}
+    - {name: anonymous_id, type: string}
+    - {name: customer_id, type: bigint}
+    - {name: page_url, type: string}
+    - {name: product_id, type: bigint}
+    - {name: order_id, type: bigint}
+    - {name: device, type: string}
+    - {name: country_code, type: string}
+
+quality:
+  - {check: not_null, column: event_id}
+  - {check: not_null, column: event_ts}
+  - {check: not_null, column: anonymous_id}
+  - check: accepted_values
+    column: event_type
+    values:
+      [page_view, search, product_view, add_to_cart, remove_from_cart, begin_checkout, purchase]
+  - {check: accepted_values, column: device, values: [desktop, mobile, tablet]}
+  - check: timestamp_window
+    column: event_ts
+    reference: _kafka_ts
+    max_lag: 3 days
+    max_lead: 5 minutes
+
+target:
+  source: events
+  dataset: clickstream
+  deduplicate_on: [event_id]
+
+aggregations:
+  - dataset: clickstream_traffic_5min
+    time_column: event_ts
+    window: 5 minutes
+    watermark: 10 minutes
+    group_by: [event_type, device]
+    distinct_count_column: anonymous_id

@@ -1,0 +1,21 @@
+sources:
+  - name: events
+    description: >
+      Clickstream consumed from Kafka (topic shop.clickstream.v1) by Spark Structured Streaming.
+      At-least-once delivery: an event can appear twice (deduplicated in the intermediate layer).
+    schema: raw
+    config:
+      loaded_at_field: _ingested_at
+      freshness:
+        warn_after: {count: 1, period: hour}
+        error_after: {count: 6, period: hour}
+    tables:
+      - name: clickstream
+        identifier: events_clickstream
+      - name: traffic_5min
+        identifier: events_clickstream_traffic_5min
+        description: >
+          Event counts per 5-minute window of event time, computed on the stream. A window is
+          written once it is closed (10-minute watermark).
+        config:
+          freshness: null

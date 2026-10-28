@@ -1,0 +1,27 @@
+name: oltp_order_items
+description: Order lines from the shop OLTP database.
+
+orchestration:
+  schedule: "@hourly"
+  retries: 2
+  tags: [batch, oltp]
+
+source:
+  type: jdbc
+  connection: OLTP_DB
+  table: shop.order_items
+  mode: incremental
+  watermark_column: updated_at
+  lookback_minutes: 10
+
+quality:
+  - {check: not_null, column: order_item_id}
+  - {check: not_null, column: order_id}
+  - {check: not_null, column: product_id}
+  - {check: range, column: quantity, min: 1}
+  - {check: range, column: unit_price, min: 0}
+  - {check: range, column: discount_amount, min: 0}
+
+target:
+  source: oltp
+  dataset: order_items

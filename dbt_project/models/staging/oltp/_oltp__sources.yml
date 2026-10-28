@@ -1,0 +1,21 @@
+sources:
+  - name: oltp
+    description: >
+      Shop OLTP database, extracted by Spark (config/pipelines/oltp_*.yaml) and loaded batch by
+      batch. One row per extracted version: incremental extracts overlap on purpose, so a row
+      can appear several times (deduplicated in the intermediate layer).
+    schema: raw
+    config:
+      loaded_at_field: _ingested_at
+      freshness:
+        warn_after: {count: 2, period: hour}
+        error_after: {count: 6, period: hour}
+    tables:
+      - name: customers
+        identifier: oltp_customers
+      - name: products
+        identifier: oltp_products
+      - name: orders
+        identifier: oltp_orders
+      - name: order_items
+        identifier: oltp_order_items

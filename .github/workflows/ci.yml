@@ -1,0 +1,94 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  lint:
+    name: Lint (Python, YAML)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: astral-sh/setup-uv@v10
+        with:
+          enable-cache: true
+      - run: uv sync --locked --only-group dev
+      - run: uv run --no-sync ruff check .
+      - run: uv run --no-sync ruff format --check .
+      - run: uv run --no-sync yamllint --strict .
+
+  tests:
+    name: Unit tests (config, quality gate on Spark, DAG factory, generator)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-java@v6
+        with:
+          distribution: temurin
+          java-version: "21"
+      - uses: astral-sh/setup-uv@v10
+        with:
+          enable-cache: true
+      - run: uv sync --locked --all-groups
+      - run: uv run --no-sync pytest
+        env:
+          AIRFLOW_HOME: ${{ runner.temp }}/airflow
+
+  dbt:
+    name: dbt build (Postgres + fixtures)
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:16.4
+        env:
+          POSTGRES_USER: ci
+          POSTGRES_PASSWORD: ci-only-password
+          POSTGRES_DB: warehouse
+        ports: ["5432:5432"]
+        options: >-
+          --health-cmd "pg_isready -U ci -d warehouse"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+    env:
+      WAREHOUSE_DB_HOST: localhost
+      WAREHOUSE_DB_PORT: "5432"
+      WAREHOUSE_DB_NAME: warehouse
+      WAREHOUSE_DB_USER: ci
+      DBT_ENV_SECRET_WAREHOUSE_PASSWORD: ci-only-password
+      DBT_PROFILES_DIR: .
+      PGPASSWORD: ci-only-password
+    steps:
+      - uses: actions/checkout@v7
+      - uses: astral-sh/setup-uv@v10
+        with:
+          enable-cache: true
+      - run: uv sync --locked --only-group dbt
+      - name: Create the raw/ops tables and load the fixtures
+        run: >-
+          psql -h localhost -U ci -d warehouse -v ON_ERROR_STOP=1
+          -f dbt_project/ci/raw_fixtures.sql
+      - name: dbt build (models, data tests, unit tests)
+        working-directory: dbt_project
+        run: |
+          uv run --no-sync dbt deps
+          uv run --no-sync dbt build
+          uv run --no-sync dbt docs generate
+
+  docker:
+    name: Docker images and compose file
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - run: cp .env.example .env
+      - run: docker compose config --quiet
+      - run: docker compose --profile jobs build generator spark-jobs dbt

@@ -1,7 +1,3 @@
--- Operational database of the fictional shop: the batch source of the platform.
--- Deliberately "realistic": foreign keys are enforced, but business rules are not
--- (no CHECK constraints), which is exactly why the ingestion has a quality gate.
-
 CREATE SCHEMA IF NOT EXISTS shop;
 
 CREATE OR REPLACE FUNCTION shop.touch_updated_at() RETURNS trigger AS $$
@@ -53,7 +49,6 @@ CREATE TABLE shop.order_items (
     updated_at      timestamptz   NOT NULL DEFAULT now()
 );
 
--- Incremental extraction relies on updated_at: index it and keep it honest with triggers.
 CREATE INDEX ON shop.customers   (updated_at);
 CREATE INDEX ON shop.products    (updated_at);
 CREATE INDEX ON shop.orders      (updated_at);

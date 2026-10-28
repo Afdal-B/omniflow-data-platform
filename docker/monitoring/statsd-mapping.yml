@@ -1,0 +1,34 @@
+mappings:
+  - match: "airflow.ti.finish.*.*.*"
+    name: airflow_task_finished_total
+    labels:
+      dag_id: "$1"
+      task_id: "$2"
+      state: "$3"
+  - match: "airflow.dagrun.duration.success.*"
+    name: airflow_dagrun_duration_seconds
+    labels:
+      dag_id: "$1"
+      state: success
+  - match: "airflow.dagrun.duration.failed.*"
+    name: airflow_dagrun_duration_seconds
+    labels:
+      dag_id: "$1"
+      state: failed
+  - match: "airflow.dag.*.*.duration"
+    name: airflow_task_duration_seconds
+    labels:
+      dag_id: "$1"
+      task_id: "$2"
+  - match: "airflow.pool.running_slots.*"
+    name: airflow_pool_running_slots
+    labels:
+      pool: "$1"
+  - match: "airflow.pool.queued_slots.*"
+    name: airflow_pool_queued_slots
+    labels:
+      pool: "$1"
+  - match: "airflow.scheduler_heartbeat"
+    name: airflow_scheduler_heartbeat_total
+  - match: "airflow.dag_processing.import_errors"
+    name: airflow_dag_import_errors

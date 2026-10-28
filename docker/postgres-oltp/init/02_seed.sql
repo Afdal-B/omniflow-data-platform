@@ -1,15 +1,5 @@
--- Initial history of the shop: customers who signed up over 2 years, 12 months of orders.
--- Generated in SQL to keep the repo small, and deterministic (setseed): every fresh
--- `docker compose up` produces the same dataset.
---
--- Durations are expressed in hours, not days: adding '1 day' to a timestamptz follows the local
--- calendar and shifts by one hour across a daylight-saving change.
---
--- Note on the `x * 0` / `WHERE g > 0` terms below: they correlate each LATERAL subquery with the
--- outer row, which forces Postgres to draw random() once per row instead of once per statement.
 SELECT setseed(0.42);
 
--- ------------------------------------------------------------------ customers (3,000, signed up over 2 years)
 INSERT INTO shop.customers (email, first_name, last_name, country_code, segment, created_at, updated_at)
 SELECT
     lower(fn) || '.' || lower(ln) || g || '@example.com',
@@ -30,16 +20,13 @@ CROSS JOIN LATERAL (
     WHERE g > 0
 ) AS person;
 
--- A few dirty records, as in every real OLTP. They never place orders, and the ingestion
--- quality gate must route them to the Dead Letter Queue.
 INSERT INTO shop.customers (email, first_name, last_name, country_code, segment)
 VALUES
-    ('jean.dupont@', 'Jean', 'Dupont', 'FR', 'consumer'),               -- invalid email
-    ('no-email-provided', 'Anne', 'Morel', 'FR', 'consumer'),           -- invalid email
-    ('k.schmidt@example.com', 'Klaus', 'Schmidt', 'germany', 'consumer'), -- not an ISO country code
-    ('b2b.buyer@example.com', 'Paul', 'Lambert', 'FR', 'enterprise');   -- unknown segment
+    ('jean.dupont@', 'Jean', 'Dupont', 'FR', 'consumer'),
+    ('no-email-provided', 'Anne', 'Morel', 'FR', 'consumer'),
+    ('k.schmidt@example.com', 'Klaus', 'Schmidt', 'germany', 'consumer'),
+    ('b2b.buyer@example.com', 'Paul', 'Lambert', 'FR', 'enterprise');
 
--- ------------------------------------------------------------------ products (240)
 INSERT INTO shop.products (sku, product_name, category, unit_price, created_at, updated_at)
 SELECT
     'SKU-' || lpad(g::text, 5, '0'),
@@ -56,10 +43,6 @@ CROSS JOIN LATERAL (
         (ARRAY['Headphones', 'Lamp', 'Jacket', 'Sneakers', 'Serum', 'Novel', 'Backpack', 'Watch', 'Mug', 'Yoga Mat'])[1 + floor(random() * 10)::int] AS noun
 ) AS p;
 
--- ------------------------------------------------------------------ orders (15,000 over 12 months) and lines
--- Orders are spread evenly over the last 12 months; each one is placed by a customer who had
--- already signed up at that time. Its status depends on its age: recent orders are still
--- pending/paid, then shipped, then delivered (or cancelled/refunded).
 WITH order_draws AS (
     SELECT
         now() - random() * interval '8760 hours' AS order_ts,
@@ -74,7 +57,7 @@ dated_orders AS (
         SELECT c.customer_id
         FROM shop.customers AS c
         WHERE c.created_at < d.order_ts
-          AND c.customer_id <= 3000          -- the dirty customers never order
+          AND c.customer_id <= 3000
         ORDER BY random()
         LIMIT 1
     ) AS buyer
@@ -94,7 +77,6 @@ new_orders AS (
         channel,
         'EUR',
         order_ts,
-        -- last status change: a few days after the order, never in the future
         LEAST(order_ts + interval '96 hours', now())
     FROM dated_orders
     RETURNING order_id, order_ts
