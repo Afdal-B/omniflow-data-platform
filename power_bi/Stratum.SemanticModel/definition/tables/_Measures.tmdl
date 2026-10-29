@@ -23,7 +23,10 @@ table '_Measures'
 		lineageTag: a08ee480-c5e9-5306-96c8-83f2eca1098a
 
 	measure 'Revenue Previous Month' = ```
-			CALCULATE ( [Revenue], DATEADD ( dim_date[date_day], -1, MONTH ) )
+			IF (
+			            NOT ISBLANK ( [Revenue] ),
+			            CALCULATE ( [Revenue], DATEADD ( dim_date[date_day], -1, MONTH ) )
+			        )
 			```
 		formatString: #,0 €
 		displayFolder: Sales
@@ -252,7 +255,7 @@ table '_Measures'
 			VAR days_covered = DISTINCTCOUNT ( fct_pipeline_runs[run_date] )
 			        RETURN DIVIDE ( [Estimated Cost (USD)], days_covered ) * 30
 			```
-		formatString: \$#,0.0000
+		formatString: \$#,0.00
 		displayFolder: Platform & FinOps
 		lineageTag: c4ccc990-2d7d-58ed-aae9-48d29bf77d7f
 

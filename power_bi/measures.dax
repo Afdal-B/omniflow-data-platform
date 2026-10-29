@@ -10,7 +10,10 @@ DEFINE
         DIVIDE ( [Revenue], [Orders] )
 
     MEASURE '_Measures'[Revenue Previous Month] =
-        CALCULATE ( [Revenue], DATEADD ( dim_date[date_day], -1, MONTH ) )
+        IF (
+            NOT ISBLANK ( [Revenue] ),
+            CALCULATE ( [Revenue], DATEADD ( dim_date[date_day], -1, MONTH ) )
+        )
 
     MEASURE '_Measures'[Revenue MoM %] =
         DIVIDE ( [Revenue] - [Revenue Previous Month], [Revenue Previous Month] )

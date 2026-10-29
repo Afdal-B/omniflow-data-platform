@@ -53,7 +53,14 @@ RELATIONSHIPS = [
     ("fct_order_items", "product_id", "dim_products", "product_id"),
 ]
 
-EUR, PCT, INT, USD, DEC = "#,0 €", "0.0%", "#,0", "\\$#,0.0000", "#,0.0"
+EUR, PCT, INT, USD, USD2, DEC = (
+    "#,0 €",
+    "0.0%",
+    "#,0",
+    "\\$#,0.0000",
+    "\\$#,0.00",
+    "#,0.0",
+)
 MEASURE_FORMATS = {
     "Revenue": EUR, "Average Order Value": EUR, "Revenue Previous Month": EUR,
     "Product Revenue": EUR, "Average Lifetime Value": EUR,
@@ -61,7 +68,7 @@ MEASURE_FORMATS = {
     "Returning Customer Share": PCT, "Conversion Rate": PCT, "Cart Abandonment Rate": PCT,
     "Success Rate": PCT, "DLQ Rate": PCT,
     "Estimated Cost (USD)": USD, "Cost per Million Rows (USD)": USD,
-    "Estimated Monthly Cost (USD)": USD,
+    "Estimated Monthly Cost (USD)": USD2,
     "Avg Session Duration (min)": DEC, "Avg Run Duration (s)": DEC, "P95 Run Duration (s)": DEC,
 }  # fmt: skip
 MEASURE_FOLDERS = {
