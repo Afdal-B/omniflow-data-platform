@@ -1,3 +1,5 @@
+"""Entry point of the generator: publishes visits and updates the shop."""
+
 from __future__ import annotations
 
 import json
@@ -23,6 +25,7 @@ log = logging.getLogger("generator")
 def connect_with_retry(
     settings: Settings, rng: random.Random, attempts: int = 30
 ) -> PostgresShop:
+    """Connect to the shop database, waiting for it to start."""
     for attempt in range(1, attempts + 1):
         try:
             return PostgresShop(settings.oltp_conninfo, rng)
@@ -33,6 +36,7 @@ def connect_with_retry(
 
 
 def build_producer(settings: Settings) -> Producer:
+    """Idempotent Kafka producer."""
     return Producer(
         {
             "bootstrap.servers": settings.kafka_bootstrap_servers,
@@ -45,6 +49,7 @@ def build_producer(settings: Settings) -> Producer:
 
 
 def main() -> None:
+    """Generate traffic until stopped."""
     logging.basicConfig(
         level=logging.INFO, format="%(asctime)s %(levelname)s %(name)s - %(message)s"
     )

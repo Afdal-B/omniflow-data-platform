@@ -1,3 +1,5 @@
+"""Tests of the lake path layout."""
+
 from datetime import UTC, datetime, timedelta, timezone
 
 import pytest

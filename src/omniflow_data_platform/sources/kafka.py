@@ -1,3 +1,5 @@
+"""Ingestion of a Kafka topic into bronze with Structured Streaming."""
+
 from __future__ import annotations
 
 import logging
@@ -25,6 +27,7 @@ METADATA_COLUMNS = ["_batch_id", "_ingested_at", "_source"]
 
 
 def read_events(spark: SparkSession, source: KafkaSource) -> DataFrame:
+    """Stream of the topic events, parsed from JSON."""
     reader = (
         spark.readStream.format("kafka")
         .option("kafka.bootstrap.servers", os.environ["KAFKA_BOOTSTRAP_SERVERS"])
@@ -45,6 +48,7 @@ def read_events(spark: SparkSession, source: KafkaSource) -> DataFrame:
 
 
 def parse_payload(raw: DataFrame, source: KafkaSource) -> DataFrame:
+    """Parse the JSON payload, keeping unreadable messages."""
     schema = f"{source.schema_ddl}, {CORRUPT_RECORD_COL} string"
     parse_options = {
         "mode": "PERMISSIVE",
@@ -58,6 +62,7 @@ def parse_payload(raw: DataFrame, source: KafkaSource) -> DataFrame:
 
 
 def with_metadata(df: DataFrame, batch_id: str, source_name: str) -> DataFrame:
+    """Add the batch and lineage columns."""
     return df.select(
         "*",
         F.lit(batch_id).alias("_batch_id"),
@@ -67,6 +72,7 @@ def with_metadata(df: DataFrame, batch_id: str, source_name: str) -> DataFrame:
 
 
 def window_counts(valid_events: DataFrame, agg: WindowAggregation) -> DataFrame:
+    """Event counts per time window, with a watermark."""
     measures = {"event_count": F.count(F.lit(1))}
     if agg.distinct_count_column:
         measures[f"unique_{agg.distinct_count_column}"] = F.approx_count_distinct(
@@ -92,6 +98,7 @@ def run(
     batch_id: str,
     full_refresh: bool,
 ) -> dict:
+    """Process the available messages into bronze, the DLQ and aggregates."""
     source, target = pipeline.source, pipeline.target
     assert isinstance(source, KafkaSource)
     streams = [target.dataset, *(agg.dataset for agg in pipeline.aggregations)]

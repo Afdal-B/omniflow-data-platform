@@ -1,3 +1,5 @@
+"""Incremental extraction logic for JDBC sources."""
+
 from __future__ import annotations
 
 from dataclasses import dataclass
@@ -8,6 +10,8 @@ from omniflow_data_platform.config import JdbcSource
 
 @dataclass(frozen=True)
 class PipelineState:
+    """High-water mark persisted between two runs."""
+
     last_batch_id: str
     lower_bound: str | None
     high_watermark: str | None
@@ -19,6 +23,7 @@ def lower_bound_for(
     batch_id: str,
     full_refresh: bool,
 ) -> str | None:
+    """Watermark from which to extract, or None for a full read."""
     if source.mode == "full" or full_refresh or state is None:
         return None
     if state.last_batch_id == batch_id:
@@ -32,6 +37,7 @@ def lower_bound_for(
 
 
 def extract_query(source: JdbcSource, lower_bound: str | None) -> str:
+    """Table or subquery passed to the JDBC reader."""
     if lower_bound is None:
         return source.table
     bound = datetime.fromisoformat(lower_bound).isoformat()

@@ -1,3 +1,5 @@
+"""Run reports written by each step and merged for monitoring."""
+
 from __future__ import annotations
 
 import json
@@ -14,11 +16,14 @@ STEPS = ("ingest", "load")
 
 
 def now_iso() -> str:
+    """Current UTC time in ISO format."""
     return datetime.now(UTC).isoformat(timespec="seconds")
 
 
 @dataclass
 class StepReport:
+    """Outcome of one step of a pipeline run."""
+
     pipeline: str
     batch_id: str
     step: str
@@ -31,16 +36,19 @@ class StepReport:
     def finish(
         self, details: dict[str, Any] | None = None, error: str | None = None
     ) -> None:
+        """Mark the step as finished, failed if an error is given."""
         self.finished_at = now_iso()
         self.status = "failed" if error else "success"
         self.details = details or {}
         self.error = error
 
     def to_json(self) -> str:
+        """Report serialized as JSON."""
         return json.dumps(asdict(self))
 
 
 def summarize_error(exc: BaseException, max_length: int = 1000) -> str:
+    """Short one-line description of an exception."""
     text = "".join(traceback.format_exception_only(exc))
     lines = [
         line.strip()
@@ -57,6 +65,7 @@ def run_step(
     work: Callable[[], dict[str, Any]],
     save: Callable[[StepReport], None],
 ) -> dict[str, Any]:
+    """Run a step and save its report, even when it fails."""
     report = StepReport(pipeline=pipeline, batch_id=batch_id, step=step)
     try:
         details = work()
@@ -74,6 +83,7 @@ def run_step(
 
 
 def _duration_s(started_at: str, finished_at: str | None) -> float | None:
+    """Duration in seconds between two ISO timestamps."""
     if finished_at is None:
         return None
     delta = datetime.fromisoformat(finished_at) - datetime.fromisoformat(started_at)
@@ -86,6 +96,7 @@ def merge_reports(
     ingest: dict[str, Any] | None,
     load: dict[str, Any] | None,
 ) -> dict[str, Any]:
+    """Merge the ingest and load reports into one run record."""
     ingest_status = ingest["status"] if ingest else "no_report"
     if load:
         load_status = load["status"]

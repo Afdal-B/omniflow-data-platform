@@ -1,3 +1,5 @@
+"""Spark session configured from the environment."""
+
 from __future__ import annotations
 
 import os
@@ -6,6 +8,7 @@ from pyspark.sql import SparkSession
 
 
 def build_spark(app_name: str) -> SparkSession:
+    """Spark session with the S3A and package settings of the environment."""
     builder = (
         SparkSession.builder.appName(app_name)
         .master(os.environ.get("SPARK_MASTER", "local[*]"))

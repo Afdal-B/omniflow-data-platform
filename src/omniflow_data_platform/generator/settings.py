@@ -1,3 +1,5 @@
+"""Generator settings."""
+
 from __future__ import annotations
 
 import os
@@ -6,6 +8,8 @@ from dataclasses import dataclass
 
 @dataclass(frozen=True)
 class Settings:
+    """Generator settings."""
+
     kafka_bootstrap_servers: str
     clickstream_topic: str
     oltp_conninfo: str
@@ -16,6 +20,7 @@ class Settings:
 
     @classmethod
     def from_env(cls) -> Settings:
+        """Settings read from the environment."""
         env = os.environ
         seed = env.get("GENERATOR_SEED")
         return cls(

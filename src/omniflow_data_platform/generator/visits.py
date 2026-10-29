@@ -1,3 +1,5 @@
+"""Simulation of a visit on the shop website."""
+
 from __future__ import annotations
 
 import random
@@ -40,26 +42,33 @@ P_PURCHASE = 0.6
 
 @dataclass(frozen=True)
 class Product:
+    """Product as seen by a visitor."""
+
     product_id: int
     unit_price: Decimal
 
 
 class Shop(Protocol):
-    def random_customer(self) -> int | None: ...
+    """Operations a visit needs from the shop."""
 
-    def random_products(self, n: int) -> list[Product]: ...
+    def random_customer(self) -> int | None:
+        """Random known customer, if any."""
 
-    def create_customer(self) -> int: ...
+    def random_products(self, n: int) -> list[Product]:
+        """Up to n random products."""
 
-    def create_order(
-        self, customer_id: int, cart: list[Product], channel: str
-    ) -> int: ...
+    def create_customer(self) -> int:
+        """Create a customer and return its id."""
+
+    def create_order(self, customer_id: int, cart: list[Product], channel: str) -> int:
+        """Create an order and return its id."""
 
 
 Event = dict[str, Any]
 
 
 def simulate_visit(shop: Shop, rng: random.Random, now: datetime) -> list[Event]:
+    """Events of one visit, creating the order on purchase."""
     customer_id = shop.random_customer() if rng.random() < P_KNOWN_CUSTOMER else None
     device = rng.choices(DEVICES, DEVICE_WEIGHTS)[0]
     visitor = {

@@ -1,3 +1,5 @@
+"""Tests of the pipeline configuration contract."""
+
 from pathlib import Path
 
 import pytest

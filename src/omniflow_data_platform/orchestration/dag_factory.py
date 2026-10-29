@@ -1,3 +1,5 @@
+"""Airflow DAGs generated from the pipeline configurations."""
+
 from __future__ import annotations
 
 import os
@@ -44,10 +46,12 @@ BATCH_ID = "{{ dag_run.run_after.strftime('%Y%m%dT%H%M%SZ') }}"
 
 
 def raw_table_asset(source: str, dataset: str) -> Asset:
+    """Airflow asset of a warehouse raw table."""
     return Asset(name=f"warehouse.raw.{raw_table_name(source, dataset)}")
 
 
 def spark_job(task_id: str, command: str, **kwargs) -> DockerOperator:
+    """Task running a Spark job in its container."""
     return DockerOperator(
         task_id=task_id,
         image=SPARK_IMAGE,
@@ -74,6 +78,7 @@ def spark_job(task_id: str, command: str, **kwargs) -> DockerOperator:
 
 
 def _doc(pipeline: PipelineConfig) -> str:
+    """Markdown documentation of an ingestion DAG."""
     rules = "\n".join(f"- `{r.check}` on `{r.column}`" for r in pipeline.quality)
     location = getattr(pipeline.source, "table", None) or pipeline.source.topic
     return (
@@ -87,6 +92,7 @@ def _doc(pipeline: PipelineConfig) -> str:
 
 
 def build_dag(pipeline: PipelineConfig) -> DAG:
+    """Ingestion DAG of a pipeline: ingest, load, then record the run."""
     orchestration = pipeline.orchestration
     with DAG(
         dag_id=f"ingest__{pipeline.name}",
@@ -137,6 +143,7 @@ def build_dag(pipeline: PipelineConfig) -> DAG:
 
 
 def dbt_task(task_id: str, command: str) -> DockerOperator:
+    """Task running a dbt command in its container."""
     env = os.environ
     return DockerOperator(
         task_id=task_id,
@@ -158,6 +165,7 @@ def dbt_task(task_id: str, command: str) -> DockerOperator:
 
 
 def build_transform_dag(pipelines: list[PipelineConfig]) -> DAG:
+    """dbt DAG triggered by the update of the raw tables."""
     with DAG(
         dag_id=TRANSFORM_DAG_ID,
         description="dbt: staging -> intermediate (silver) -> marts (gold), tested layer by layer.",
@@ -194,6 +202,7 @@ def build_transform_dag(pipelines: list[PipelineConfig]) -> DAG:
 
 
 def build_all_dags() -> list[DAG]:
+    """Every ingestion DAG and the transformation DAG."""
     pipelines = load_all_pipelines()
     return [
         *(build_dag(pipeline) for pipeline in pipelines),

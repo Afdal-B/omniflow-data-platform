@@ -1,3 +1,5 @@
+"""Tests of the run reports."""
+
 import json
 
 import pytest

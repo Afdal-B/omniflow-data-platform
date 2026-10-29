@@ -1,3 +1,5 @@
+"""Tests of the visit simulation."""
+
 import random
 from datetime import UTC, datetime
 from decimal import Decimal
@@ -22,6 +24,8 @@ EXPECTED_KEYS = {
 
 
 class FakeShop:
+    """In-memory shop recording the orders it receives."""
+
     def __init__(self) -> None:
         self.orders: list[tuple[int, list[Product], str]] = []
         self.new_customers = 0

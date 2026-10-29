@@ -1,3 +1,5 @@
+"""Job loading bronze batches into the warehouse raw schema."""
+
 from __future__ import annotations
 
 import argparse
@@ -32,6 +34,7 @@ def load_dataset(
     dataset: str,
     batch_id: str | None,
 ) -> int | None:
+    """Load one dataset into its raw table; None when nothing to load."""
     if batch_id is None:
         path = lake.dataset_path("bronze", source, dataset)
     else:
@@ -58,6 +61,7 @@ def load_dataset(
 
 
 def main(argv: list[str] | None = None) -> None:
+    """Load a pipeline batch, or its whole history, into the warehouse."""
     parser = argparse.ArgumentParser(description="Load bronze data into the warehouse.")
     parser.add_argument(
         "--pipeline", required=True, help="config/pipelines/<name>.yaml"

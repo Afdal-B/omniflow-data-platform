@@ -1,3 +1,5 @@
+"""Ingestion of a relational table into bronze."""
+
 from __future__ import annotations
 
 import logging
@@ -23,6 +25,7 @@ STATE_SCHEMA = "last_batch_id string, lower_bound string, high_watermark string"
 
 
 def read_state(spark: SparkSession, path: str) -> PipelineState | None:
+    """Incremental state of the pipeline, if any."""
     if not path_exists(spark, path):
         return None
     row = spark.read.schema(STATE_SCHEMA).json(path).first()
@@ -32,12 +35,14 @@ def read_state(spark: SparkSession, path: str) -> PipelineState | None:
 
 
 def write_state(spark: SparkSession, path: str, state: PipelineState) -> None:
+    """Persist the incremental state."""
     spark.createDataFrame([state.__dict__], STATE_SCHEMA).coalesce(1).write.mode(
         "overwrite"
     ).json(path)
 
 
 def read_table(spark: SparkSession, source: JdbcSource, query: str) -> DataFrame:
+    """Read the query result over JDBC."""
     env, prefix = os.environ, source.connection
     url = (
         f"jdbc:postgresql://{env[f'{prefix}_HOST']}:{env.get(f'{prefix}_PORT', '5432')}"
@@ -62,6 +67,7 @@ def run(
     batch_id: str,
     full_refresh: bool,
 ) -> dict:
+    """Extract, check and write one batch to bronze and the DLQ."""
     source, target = pipeline.source, pipeline.target
     assert isinstance(source, JdbcSource)
     incremental = source.mode == "incremental"

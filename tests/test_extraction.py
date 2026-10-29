@@ -1,3 +1,5 @@
+"""Tests of the incremental extraction logic."""
+
 from omniflow_data_platform.config import JdbcSource
 from omniflow_data_platform.extraction import (
     PipelineState,

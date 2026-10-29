@@ -1,10 +1,12 @@
+"""Tests of the generated Airflow DAGs."""
+
 from itertools import pairwise
 
 import pytest
 
 pytest.importorskip("airflow.sdk")
 
-from airflow.models.dagbag import DagBag
+from airflow.dag_processing.dagbag import DagBag
 
 from omniflow_data_platform.config import load_all_pipelines
 from omniflow_data_platform.orchestration.dag_factory import (

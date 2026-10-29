@@ -1,3 +1,5 @@
+"""Job ingesting one pipeline batch into the bronze zone."""
+
 from __future__ import annotations
 
 import argparse
@@ -19,6 +21,7 @@ RUNNERS = {"jdbc": jdbc.run, "kafka": kafka.run}
 
 
 def main(argv: list[str] | None = None) -> None:
+    """Run the ingest step of a pipeline."""
     parser = argparse.ArgumentParser(description="Run one ingestion pipeline.")
     parser.add_argument(
         "--pipeline", required=True, help="config/pipelines/<name>.yaml"

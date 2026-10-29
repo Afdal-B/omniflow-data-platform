@@ -1,3 +1,5 @@
+"""Writes to the PostgreSQL warehouse."""
+
 from __future__ import annotations
 
 import os
@@ -10,6 +12,8 @@ from psycopg.types.json import Jsonb
 
 @dataclass(frozen=True)
 class WarehouseConnection:
+    """Connection settings of the warehouse."""
+
     host: str
     port: str
     dbname: str
@@ -18,6 +22,7 @@ class WarehouseConnection:
 
     @classmethod
     def from_env(cls, prefix: str = "WAREHOUSE_DB") -> WarehouseConnection:
+        """Settings read from <prefix>_* variables."""
         env = os.environ
         return cls(
             host=env[f"{prefix}_HOST"],
@@ -29,9 +34,11 @@ class WarehouseConnection:
 
     @property
     def jdbc_url(self) -> str:
+        """JDBC URL used by Spark."""
         return f"jdbc:postgresql://{self.host}:{self.port}/{self.dbname}"
 
     def connect(self) -> psycopg.Connection:
+        """Open a psycopg connection in UTC."""
         return psycopg.connect(
             host=self.host,
             port=self.port,
@@ -43,6 +50,7 @@ class WarehouseConnection:
 
 
 def transit_table_name(table: str) -> str:
+    """Name of the transit table used during a load."""
     return f"_load_{table}"
 
 
@@ -51,6 +59,7 @@ def publish(
     table: str,
     batch_id: str | None,
 ) -> int:
+    """Move a transit table into its raw table in one transaction."""
     target = sql.Identifier("raw", table)
     transit = sql.Identifier("raw", transit_table_name(table))
     with conn.transaction():
@@ -79,6 +88,7 @@ def publish(
 
 
 def _columns(conn: psycopg.Connection, table: str) -> list[str]:
+    """Columns of a raw table, in order."""
     rows = conn.execute(
         "SELECT column_name FROM information_schema.columns "
         "WHERE table_schema = 'raw' AND table_name = %s ORDER BY ordinal_position",
@@ -88,6 +98,7 @@ def _columns(conn: psycopg.Connection, table: str) -> list[str]:
 
 
 def _add_missing_columns(conn: psycopg.Connection, table: str) -> None:
+    """Add to the raw table the columns new in the transit table."""
     existing = set(_columns(conn, table))
     new_columns = conn.execute(
         "SELECT a.attname, format_type(a.atttypid, a.atttypmod) "
@@ -152,6 +163,7 @@ _RUN_COLUMNS = (
 
 
 def record_pipeline_run(conn: psycopg.Connection, run: dict) -> None:
+    """Insert or update a run in ops.pipeline_runs."""
     columns = sql.SQL(", ").join(sql.Identifier(c) for c in _RUN_COLUMNS)
     updates = sql.SQL(", ").join(
         sql.SQL("{} = EXCLUDED.{}").format(sql.Identifier(c), sql.Identifier(c))

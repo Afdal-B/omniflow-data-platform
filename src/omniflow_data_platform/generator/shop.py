@@ -1,3 +1,5 @@
+"""Shop backed by the OLTP PostgreSQL database."""
+
 from __future__ import annotations
 
 import random
@@ -12,6 +14,8 @@ VALID_EMAIL = r"^[^@\s]+@[^@\s]+\.[A-Za-z]{2,}$"
 
 
 class PostgresShop:
+    """Reads and writes the shop schema of the OLTP database."""
+
     def __init__(self, conninfo: str, rng: random.Random) -> None:
         self.conn = psycopg.connect(conninfo, autocommit=True)
         self.rng = rng
@@ -19,9 +23,11 @@ class PostgresShop:
         self.fake.seed_instance(rng.random())
 
     def close(self) -> None:
+        """Close the connection."""
         self.conn.close()
 
     def random_customer(self) -> int | None:
+        """Random customer with a valid email, if any."""
         row = self.conn.execute(
             "SELECT customer_id FROM shop.customers WHERE email ~ %s ORDER BY random() LIMIT 1",
             (VALID_EMAIL,),
@@ -29,6 +35,7 @@ class PostgresShop:
         return row[0] if row else None
 
     def random_products(self, n: int) -> list[Product]:
+        """Up to n random active products."""
         rows = self.conn.execute(
             "SELECT product_id, unit_price FROM shop.products WHERE is_active ORDER BY random() LIMIT %s",
             (n,),
@@ -36,6 +43,7 @@ class PostgresShop:
         return [Product(product_id, unit_price) for product_id, unit_price in rows]
 
     def create_customer(self) -> int:
+        """Create a customer and return its id."""
         first_name, last_name = self.fake.first_name(), self.fake.last_name()
         local_part = (
             f"{first_name}.{last_name}.{self.rng.randint(1, 999_999)}".lower().replace(
@@ -58,6 +66,7 @@ class PostgresShop:
         return row[0]
 
     def create_order(self, customer_id: int, cart: list[Product], channel: str) -> int:
+        """Create a pending order with its items."""
         with self.conn.transaction():
             row = self.conn.execute(
                 "INSERT INTO shop.orders (customer_id, status, channel) "
@@ -88,6 +97,7 @@ class PostgresShop:
         return order_id
 
     def advance_orders(self, limit: int = 50) -> int:
+        """Move orders to their next status once old enough."""
         result = self.conn.execute(
             """
             UPDATE shop.orders
@@ -110,6 +120,7 @@ class PostgresShop:
         return result.rowcount
 
     def reprice_product(self) -> None:
+        """Change the price of a random product by up to 10%."""
         self.conn.execute(
             "UPDATE shop.products SET unit_price = round((unit_price * (0.9 + random() * 0.2))::numeric, 2) "
             "WHERE product_id = (SELECT product_id FROM shop.products ORDER BY random() LIMIT 1)"

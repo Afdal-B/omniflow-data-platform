@@ -1,3 +1,5 @@
+"""Tests of the data quality rules on Spark."""
+
 import subprocess
 
 import pytest

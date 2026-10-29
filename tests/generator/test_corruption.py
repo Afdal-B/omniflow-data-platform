@@ -1,3 +1,5 @@
+"""Tests of the event corruptions."""
+
 import json
 import random
 from datetime import datetime

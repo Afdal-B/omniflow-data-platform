@@ -1,3 +1,5 @@
+"""Job recording the outcome of a pipeline run in the warehouse."""
+
 from __future__ import annotations
 
 import argparse
@@ -16,6 +18,7 @@ log = logging.getLogger("record_run")
 
 
 def main(argv: list[str] | None = None) -> None:
+    """Merge the step reports of a run and store them in ops.pipeline_runs."""
     parser = argparse.ArgumentParser(
         description="Record a pipeline run for monitoring."
     )
