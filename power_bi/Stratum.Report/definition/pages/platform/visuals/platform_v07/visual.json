@@ -2,33 +2,38 @@
   "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/1.5.0/schema.json",
   "name": "platform_v07",
   "position": {
-    "x": 16,
-    "y": 432,
+    "x": 792,
+    "y": 200,
     "z": 7000,
-    "width": 1248,
-    "height": 272,
+    "width": 464,
+    "height": 248,
     "tabOrder": 7000
   },
   "visual": {
-    "visualType": "tableEx",
+    "visualType": "clusteredBarChart",
     "query": {
       "queryState": {
-        "Values": {
+        "Category": {
           "projections": [
             {
               "field": {
                 "Column": {
                   "Expression": {
                     "SourceRef": {
-                      "Entity": "fct_pipeline_runs"
+                      "Entity": "fct_pipeline_rejections"
                     }
                   },
-                  "Property": "pipeline_name"
+                  "Property": "rejection_reason"
                 }
               },
-              "queryRef": "fct_pipeline_runs.pipeline_name",
-              "nativeQueryRef": "pipeline_name"
-            },
+              "queryRef": "fct_pipeline_rejections.rejection_reason",
+              "nativeQueryRef": "rejection_reason",
+              "displayName": "Règle"
+            }
+          ]
+        },
+        "Y": {
+          "projections": [
             {
               "field": {
                 "Measure": {
@@ -37,70 +42,32 @@
                       "Entity": "_Measures"
                     }
                   },
-                  "Property": "Pipeline Runs"
+                  "Property": "Rejected Rows by Rule"
                 }
               },
-              "queryRef": "_Measures.Pipeline Runs",
-              "nativeQueryRef": "Pipeline Runs"
-            },
-            {
-              "field": {
-                "Measure": {
-                  "Expression": {
-                    "SourceRef": {
-                      "Entity": "_Measures"
-                    }
-                  },
-                  "Property": "Failed Runs"
-                }
-              },
-              "queryRef": "_Measures.Failed Runs",
-              "nativeQueryRef": "Failed Runs"
-            },
-            {
-              "field": {
-                "Measure": {
-                  "Expression": {
-                    "SourceRef": {
-                      "Entity": "_Measures"
-                    }
-                  },
-                  "Property": "Avg Run Duration (s)"
-                }
-              },
-              "queryRef": "_Measures.Avg Run Duration (s)",
-              "nativeQueryRef": "Avg Run Duration (s)"
-            },
-            {
-              "field": {
-                "Measure": {
-                  "Expression": {
-                    "SourceRef": {
-                      "Entity": "_Measures"
-                    }
-                  },
-                  "Property": "P95 Run Duration (s)"
-                }
-              },
-              "queryRef": "_Measures.P95 Run Duration (s)",
-              "nativeQueryRef": "P95 Run Duration (s)"
-            },
-            {
-              "field": {
-                "Measure": {
-                  "Expression": {
-                    "SourceRef": {
-                      "Entity": "_Measures"
-                    }
-                  },
-                  "Property": "Estimated Cost (USD)"
-                }
-              },
-              "queryRef": "_Measures.Estimated Cost (USD)",
-              "nativeQueryRef": "Estimated Cost (USD)"
+              "queryRef": "_Measures.Rejected Rows by Rule",
+              "nativeQueryRef": "Rejected Rows by Rule",
+              "displayName": "Lignes rejetées"
             }
           ]
         }
+      },
+      "sortDefinition": {
+        "sort": [
+          {
+            "field": {
+              "Measure": {
+                "Expression": {
+                  "SourceRef": {
+                    "Entity": "_Measures"
+                  }
+                },
+                "Property": "Rejected Rows by Rule"
+              }
+            },
+            "direction": "Descending"
+          }
+        ]
       }
     },
     "visualContainerObjects": {
@@ -117,7 +84,7 @@
             "text": {
               "expr": {
                 "Literal": {
-                  "Value": "'Performance et coût estimé par pipeline'"
+                  "Value": "'Rejets par règle qualité'"
                 }
               }
             }

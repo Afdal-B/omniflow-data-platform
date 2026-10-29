@@ -119,15 +119,19 @@ def read_measures() -> dict[str, str]:
 
 def m_query(table: str, columns: list[tuple[str, str]]) -> str:
     numbers = [f'{{"{c}", type number}}' for c, t in columns if t == "num"]
-    stamps = [
-        f'{{"{c}", each if _ = null then null else DateTimeZone.RemoveZone(DateTimeZone.ToUtc(_)), type datetime}}'
-        for c, t in columns
-        if t == "ts"
-    ]
+    stamps = [f'{{"{c}", ToUtc, type datetime}}' for c, t in columns if t == "ts"]
     steps = [
         "Source = PostgreSQL.Database(WarehouseServer, WarehouseDatabase)",
         f'Data = Source{{[Schema = "marts", Item = "{table}"]}}[Data]',
     ]
+    if stamps:
+        steps.insert(
+            0,
+            "ToUtc = (value) => if value = null then null"
+            " else if Value.Is(value, type datetimezone)"
+            " then DateTimeZone.RemoveZone(DateTimeZone.ToUtc(value))"
+            " else value",
+        )
     last = "Data"
     if numbers:
         steps.append(
@@ -270,49 +274,79 @@ def field(entity: str, prop: str, kind: str) -> dict:
     return {kind: {"Expression": {"SourceRef": {"Entity": entity}}, "Property": prop}}
 
 
+LABELS = {
+    "Revenue": "Chiffre d'affaires",
+    "Revenue Previous Month": "Mois précédent",
+    "Orders": "Commandes",
+    "Average Order Value": "Panier moyen",
+    "Cancellation Rate": "Taux d'annulation",
+    "Product Revenue": "Chiffre d'affaires",
+    "Units Sold": "Unités vendues",
+    "Sessions": "Visites",
+    "Sessions With Product View": "Produit consulté",
+    "Sessions With Cart": "Ajout au panier",
+    "Sessions With Checkout": "Paiement commencé",
+    "Converted Sessions": "Achat",
+    "Conversion Rate": "Taux de conversion",
+    "Cart Abandonment Rate": "Abandon de panier",
+    "Returning Customer Share": "Clients récurrents",
+    "Customers": "Clients",
+    "Visitors (5-min windows)": "Visiteurs",
+    "Pipeline Runs": "Exécutions",
+    "Success Rate": "Taux de succès",
+    "DLQ Rate": "Taux de rejet (DLQ)",
+    "Estimated Monthly Cost (USD)": "Coût mensuel estimé",
+    "Rows Ingested": "Lignes ingérées",
+    "Rejected Rows by Rule": "Lignes rejetées",
+    "Failed Runs": "Échecs",
+    "Avg Run Duration (s)": "Durée moyenne (s)",
+    "P95 Run Duration (s)": "Durée P95 (s)",
+    "Estimated Cost (USD)": "Coût estimé",
+    "month_start_date": "Mois",
+    "channel": "Canal",
+    "category": "Catégorie",
+    "product_name": "Produit",
+    "device": "Appareil",
+    "country_code": "Pays",
+    "lifecycle_stage": "Cycle de vie",
+    "window_start": "Fenêtre",
+    "date_day": "Jour",
+    "pipeline_name": "Pipeline",
+    "rejection_reason": "Règle",
+}
+
+
 def projection(ref: str) -> dict:
     entity, prop = ref.split(".", 1)
     kind = "Measure" if entity == MEASURES_TABLE else "Column"
-    return {"field": field(entity, prop, kind), "queryRef": ref, "nativeQueryRef": prop}
+    result = {
+        "field": field(entity, prop, kind),
+        "queryRef": ref,
+        "nativeQueryRef": prop,
+    }
+    if prop in LABELS:
+        result["displayName"] = LABELS[prop]
+    return result
 
 
 def literal(value: str) -> dict:
     return {"expr": {"Literal": {"Value": value}}}
 
 
-class Page:
-    def __init__(self, name: str, title: str) -> None:
-        self.name, self.title, self.visuals = name, title, []
+MARGIN, GAP, PAGE_WIDTH, PAGE_HEIGHT = 24, 16, 1280, 720
+CONTENT = PAGE_WIDTH - 2 * MARGIN
+WIDE, NARROW, HALF = 752, CONTENT - 752 - GAP, (CONTENT - GAP) // 2
+ROW_KPI, ROW_MAIN, ROW_BOTTOM = (92, 92), (200, 248), (464, 232)
 
-    def add(
-        self,
-        visual_type: str,
-        roles: dict[str, list[str]],
-        box: tuple[int, int, int, int],
-        title: str = "",
-    ) -> None:
+
+class Page:
+    def __init__(self, name: str, title: str, subtitle: str) -> None:
+        self.name, self.title, self.subtitle, self.visuals = name, title, subtitle, []
+        self._header()
+
+    def _append(self, visual: dict, box: tuple[int, int, int, int]) -> None:
         x, y, w, h = box
         index = len(self.visuals)
-        visual = {
-            "visualType": visual_type,
-            "query": {
-                "queryState": {
-                    r: {"projections": [projection(f) for f in fields]}
-                    for r, fields in roles.items()
-                }
-            },
-        }
-        if title:
-            visual["visualContainerObjects"] = {
-                "title": [
-                    {
-                        "properties": {
-                            "show": literal("true"),
-                            "text": literal(f"'{title}'"),
-                        }
-                    }
-                ]
-            }
         self.visuals.append(
             {
                 "$schema": f"{SCHEMAS}/item/report/definition/visualContainer/1.5.0/schema.json",
@@ -329,75 +363,148 @@ class Page:
             }
         )
 
-    def cards(self, measures: list[str], y: int = 16) -> None:
-        width = (1280 - 32 - 16 * (len(measures) - 1)) // len(measures)
+    def add(
+        self,
+        visual_type: str,
+        roles: dict[str, list[str]],
+        box: tuple[int, int, int, int],
+        title: str = "",
+        sort_by: str | None = None,
+        objects: dict | None = None,
+    ) -> None:
+        query: dict = {
+            "queryState": {
+                r: {"projections": [projection(f) for f in fields]}
+                for r, fields in roles.items()
+            }
+        }
+        if sort_by:
+            entity, prop = sort_by.split(".", 1)
+            kind = "Measure" if entity == MEASURES_TABLE else "Column"
+            query["sortDefinition"] = {
+                "sort": [
+                    {"field": field(entity, prop, kind), "direction": "Descending"}
+                ]
+            }
+        visual: dict = {"visualType": visual_type, "query": query}
+        if objects:
+            visual["objects"] = objects
+        if title:
+            visual["visualContainerObjects"] = {
+                "title": [
+                    {
+                        "properties": {
+                            "show": literal("true"),
+                            "text": literal(f"'{title}'"),
+                        }
+                    }
+                ]
+            }
+        self._append(visual, box)
+
+    def _header(self) -> None:
+        def run(text: str, size: str, color: str, bold: bool = False) -> dict:
+            style = {"fontSize": size, "color": color, "fontFamily": "Segoe UI"}
+            if bold:
+                style["fontWeight"] = "bold"
+            return {"textRuns": [{"value": text, "textStyle": style}]}
+
+        paragraphs = [
+            run(self.title, "20pt", "#111827", bold=True),
+            run(self.subtitle, "10pt", "#6B7280"),
+        ]
+        self._append(
+            {
+                "visualType": "textbox",
+                "objects": {"general": [{"properties": {"paragraphs": paragraphs}}]},
+            },
+            (MARGIN, 18, 820, 60),
+        )
+        self.add(
+            "slicer",
+            {"Values": ["dim_date.date_day"]},
+            (PAGE_WIDTH - MARGIN - 320, 18, 320, 60),
+            objects={"data": [{"properties": {"mode": literal("'Between'")}}]},
+        )
+
+    def kpis(self, measures: list[str]) -> None:
+        y, h = ROW_KPI
+        width = (CONTENT - GAP * (len(measures) - 1)) // len(measures)
         for i, measure in enumerate(measures):
             self.add(
                 "card",
                 {"Values": [f"{MEASURES_TABLE}.{measure}"]},
-                (16 + i * (width + 16), y, width, 104),
+                (MARGIN + i * (width + GAP), y, width, h),
             )
 
 
 def pages() -> list[Page]:
     m = MEASURES_TABLE
-    sales = Page("sales", "Ventes")
-    sales.cards(
-        [
-            "Revenue",
-            "Orders",
-            "Average Order Value",
-            "Active Customers",
-            "Cancellation Rate",
-        ]
+    main_y, main_h = ROW_MAIN
+    bottom_y, bottom_h = ROW_BOTTOM
+    left, right = MARGIN, MARGIN + WIDE + GAP
+    half_right = MARGIN + HALF + GAP
+
+    sales = Page(
+        "sales",
+        "Ventes",
+        "Chiffre d'affaires des commandes payées, expédiées ou livrées",
     )
+    sales.kpis(["Revenue", "Orders", "Average Order Value", "Cancellation Rate"])
     sales.add(
         "lineChart",
         {
             "Category": ["dim_date.month_start_date"],
             "Y": [f"{m}.Revenue", f"{m}.Revenue Previous Month"],
         },
-        (16, 136, 760, 280),
-        "Chiffre d'affaires par mois",
+        (left, main_y, WIDE, main_h),
+        "Évolution mensuelle du chiffre d'affaires",
     )
     sales.add(
         "donutChart",
         {"Category": ["fct_orders.channel"], "Y": [f"{m}.Revenue"]},
-        (792, 136, 472, 280),
-        "Chiffre d'affaires par canal",
+        (right, main_y, NARROW, main_h),
+        "Répartition par canal",
+        sort_by=f"{m}.Revenue",
     )
     sales.add(
         "clusteredBarChart",
         {"Category": ["dim_products.category"], "Y": [f"{m}.Product Revenue"]},
-        (16, 432, 616, 272),
+        (left, bottom_y, HALF, bottom_h),
         "Chiffre d'affaires par catégorie",
+        sort_by=f"{m}.Product Revenue",
     )
     sales.add(
         "tableEx",
         {
             "Values": [
                 "dim_products.product_name",
+                "dim_products.category",
                 f"{m}.Product Revenue",
                 f"{m}.Units Sold",
             ]
         },
-        (648, 432, 616, 272),
-        "Produits",
+        (half_right, bottom_y, HALF, bottom_h),
+        "Meilleurs produits",
+        sort_by=f"{m}.Product Revenue",
     )
 
-    web = Page("customers_web", "Clients & web")
-    web.cards(
+    web = Page(
+        "customers_web",
+        "Clients & web",
+        "Parcours de visite, conversion et fidélité des clients",
+    )
+    web.kpis(
         [
             "Sessions",
             "Conversion Rate",
             "Cart Abandonment Rate",
             "Returning Customer Share",
-            "Average Lifetime Value",
         ]
     )
     funnel = [
-        f"{m}.{s}"
-        for s in (
+        f"{m}.{step}"
+        for step in (
             "Sessions",
             "Sessions With Product View",
             "Sessions With Cart",
@@ -408,14 +515,15 @@ def pages() -> list[Page]:
     web.add(
         "clusteredBarChart",
         {"Y": funnel},
-        (16, 136, 616, 280),
+        (left, main_y, WIDE, main_h),
         "Entonnoir de conversion",
     )
     web.add(
         "clusteredColumnChart",
         {"Category": ["fct_sessions.device"], "Y": [f"{m}.Conversion Rate"]},
-        (648, 136, 616, 280),
+        (right, main_y, NARROW, main_h),
         "Conversion par appareil",
+        sort_by=f"{m}.Conversion Rate",
     )
     web.add(
         "columnChart",
@@ -424,8 +532,9 @@ def pages() -> list[Page]:
             "Series": ["dim_customers.lifecycle_stage"],
             "Y": [f"{m}.Customers"],
         },
-        (16, 432, 616, 272),
+        (left, bottom_y, HALF, bottom_h),
         "Clients par pays et cycle de vie",
+        sort_by=f"{m}.Customers",
     )
     web.add(
         "lineChart",
@@ -433,19 +542,17 @@ def pages() -> list[Page]:
             "Category": ["fct_web_traffic_5min.window_start"],
             "Y": [f"{m}.Visitors (5-min windows)"],
         },
-        (648, 432, 616, 272),
-        "Visiteurs par fenêtre de 5 minutes",
+        (half_right, bottom_y, HALF, bottom_h),
+        "Trafic : visiteurs par fenêtre de 5 minutes",
     )
 
-    platform = Page("platform", "Plateforme & FinOps")
-    platform.cards(
-        [
-            "Pipeline Runs",
-            "Success Rate",
-            "Rows Ingested",
-            "DLQ Rate",
-            "Estimated Monthly Cost (USD)",
-        ]
+    platform = Page(
+        "platform",
+        "Plateforme & FinOps",
+        "Santé des pipelines, qualité des données et coût estimé",
+    )
+    platform.kpis(
+        ["Pipeline Runs", "Success Rate", "DLQ Rate", "Estimated Monthly Cost (USD)"]
     )
     platform.add(
         "columnChart",
@@ -454,8 +561,8 @@ def pages() -> list[Page]:
             "Series": ["fct_pipeline_runs.pipeline_name"],
             "Y": [f"{m}.Rows Ingested"],
         },
-        (16, 136, 760, 280),
-        "Lignes ingérées par jour et pipeline",
+        (left, main_y, WIDE, main_h),
+        "Lignes ingérées par jour",
     )
     platform.add(
         "clusteredBarChart",
@@ -463,8 +570,9 @@ def pages() -> list[Page]:
             "Category": ["fct_pipeline_rejections.rejection_reason"],
             "Y": [f"{m}.Rejected Rows by Rule"],
         },
-        (792, 136, 472, 280),
+        (right, main_y, NARROW, main_h),
         "Rejets par règle qualité",
+        sort_by=f"{m}.Rejected Rows by Rule",
     )
     platform.add(
         "tableEx",
@@ -473,13 +581,15 @@ def pages() -> list[Page]:
                 "fct_pipeline_runs.pipeline_name",
                 f"{m}.Pipeline Runs",
                 f"{m}.Failed Runs",
+                f"{m}.DLQ Rate",
                 f"{m}.Avg Run Duration (s)",
                 f"{m}.P95 Run Duration (s)",
                 f"{m}.Estimated Cost (USD)",
             ]
         },
-        (16, 432, 1248, 272),
+        (left, bottom_y, CONTENT, bottom_h),
         "Performance et coût estimé par pipeline",
+        sort_by=f"{m}.Pipeline Runs",
     )
     return [sales, web, platform]  # fmt: skip
 

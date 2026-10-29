@@ -2,15 +2,15 @@
   "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/1.5.0/schema.json",
   "name": "sales_v07",
   "position": {
-    "x": 16,
-    "y": 432,
+    "x": 792,
+    "y": 200,
     "z": 7000,
-    "width": 616,
-    "height": 272,
+    "width": 464,
+    "height": 248,
     "tabOrder": 7000
   },
   "visual": {
-    "visualType": "clusteredBarChart",
+    "visualType": "donutChart",
     "query": {
       "queryState": {
         "Category": {
@@ -20,14 +20,15 @@
                 "Column": {
                   "Expression": {
                     "SourceRef": {
-                      "Entity": "dim_products"
+                      "Entity": "fct_orders"
                     }
                   },
-                  "Property": "category"
+                  "Property": "channel"
                 }
               },
-              "queryRef": "dim_products.category",
-              "nativeQueryRef": "category"
+              "queryRef": "fct_orders.channel",
+              "nativeQueryRef": "channel",
+              "displayName": "Canal"
             }
           ]
         },
@@ -41,14 +42,32 @@
                       "Entity": "_Measures"
                     }
                   },
-                  "Property": "Product Revenue"
+                  "Property": "Revenue"
                 }
               },
-              "queryRef": "_Measures.Product Revenue",
-              "nativeQueryRef": "Product Revenue"
+              "queryRef": "_Measures.Revenue",
+              "nativeQueryRef": "Revenue",
+              "displayName": "Chiffre d'affaires"
             }
           ]
         }
+      },
+      "sortDefinition": {
+        "sort": [
+          {
+            "field": {
+              "Measure": {
+                "Expression": {
+                  "SourceRef": {
+                    "Entity": "_Measures"
+                  }
+                },
+                "Property": "Revenue"
+              }
+            },
+            "direction": "Descending"
+          }
+        ]
       }
     },
     "visualContainerObjects": {
@@ -65,7 +84,7 @@
             "text": {
               "expr": {
                 "Literal": {
-                  "Value": "'Chiffre d'affaires par catégorie'"
+                  "Value": "'Répartition par canal'"
                 }
               }
             }

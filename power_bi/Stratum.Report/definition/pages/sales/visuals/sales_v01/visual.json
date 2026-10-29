@@ -2,36 +2,52 @@
   "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/1.5.0/schema.json",
   "name": "sales_v01",
   "position": {
-    "x": 268,
-    "y": 16,
+    "x": 936,
+    "y": 18,
     "z": 1000,
-    "width": 236,
-    "height": 104,
+    "width": 320,
+    "height": 60,
     "tabOrder": 1000
   },
   "visual": {
-    "visualType": "card",
+    "visualType": "slicer",
     "query": {
       "queryState": {
         "Values": {
           "projections": [
             {
               "field": {
-                "Measure": {
+                "Column": {
                   "Expression": {
                     "SourceRef": {
-                      "Entity": "_Measures"
+                      "Entity": "dim_date"
                     }
                   },
-                  "Property": "Orders"
+                  "Property": "date_day"
                 }
               },
-              "queryRef": "_Measures.Orders",
-              "nativeQueryRef": "Orders"
+              "queryRef": "dim_date.date_day",
+              "nativeQueryRef": "date_day",
+              "displayName": "Jour"
             }
           ]
         }
       }
+    },
+    "objects": {
+      "data": [
+        {
+          "properties": {
+            "mode": {
+              "expr": {
+                "Literal": {
+                  "Value": "'Between'"
+                }
+              }
+            }
+          }
+        }
+      ]
     }
   }
 }

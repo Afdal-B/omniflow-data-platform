@@ -2,11 +2,11 @@
   "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/1.5.0/schema.json",
   "name": "sales_v03",
   "position": {
-    "x": 772,
-    "y": 16,
+    "x": 336,
+    "y": 92,
     "z": 3000,
-    "width": 236,
-    "height": 104,
+    "width": 296,
+    "height": 92,
     "tabOrder": 3000
   },
   "visual": {
@@ -23,11 +23,12 @@
                       "Entity": "_Measures"
                     }
                   },
-                  "Property": "Active Customers"
+                  "Property": "Orders"
                 }
               },
-              "queryRef": "_Measures.Active Customers",
-              "nativeQueryRef": "Active Customers"
+              "queryRef": "_Measures.Orders",
+              "nativeQueryRef": "Orders",
+              "displayName": "Commandes"
             }
           ]
         }

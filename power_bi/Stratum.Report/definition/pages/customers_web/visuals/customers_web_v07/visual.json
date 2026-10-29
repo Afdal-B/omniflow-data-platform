@@ -2,15 +2,15 @@
   "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/1.5.0/schema.json",
   "name": "customers_web_v07",
   "position": {
-    "x": 16,
-    "y": 432,
+    "x": 792,
+    "y": 200,
     "z": 7000,
-    "width": 616,
-    "height": 272,
+    "width": 464,
+    "height": 248,
     "tabOrder": 7000
   },
   "visual": {
-    "visualType": "columnChart",
+    "visualType": "clusteredColumnChart",
     "query": {
       "queryState": {
         "Category": {
@@ -20,32 +20,15 @@
                 "Column": {
                   "Expression": {
                     "SourceRef": {
-                      "Entity": "dim_customers"
+                      "Entity": "fct_sessions"
                     }
                   },
-                  "Property": "country_code"
+                  "Property": "device"
                 }
               },
-              "queryRef": "dim_customers.country_code",
-              "nativeQueryRef": "country_code"
-            }
-          ]
-        },
-        "Series": {
-          "projections": [
-            {
-              "field": {
-                "Column": {
-                  "Expression": {
-                    "SourceRef": {
-                      "Entity": "dim_customers"
-                    }
-                  },
-                  "Property": "lifecycle_stage"
-                }
-              },
-              "queryRef": "dim_customers.lifecycle_stage",
-              "nativeQueryRef": "lifecycle_stage"
+              "queryRef": "fct_sessions.device",
+              "nativeQueryRef": "device",
+              "displayName": "Appareil"
             }
           ]
         },
@@ -59,14 +42,32 @@
                       "Entity": "_Measures"
                     }
                   },
-                  "Property": "Customers"
+                  "Property": "Conversion Rate"
                 }
               },
-              "queryRef": "_Measures.Customers",
-              "nativeQueryRef": "Customers"
+              "queryRef": "_Measures.Conversion Rate",
+              "nativeQueryRef": "Conversion Rate",
+              "displayName": "Taux de conversion"
             }
           ]
         }
+      },
+      "sortDefinition": {
+        "sort": [
+          {
+            "field": {
+              "Measure": {
+                "Expression": {
+                  "SourceRef": {
+                    "Entity": "_Measures"
+                  }
+                },
+                "Property": "Conversion Rate"
+              }
+            },
+            "direction": "Descending"
+          }
+        ]
       }
     },
     "visualContainerObjects": {
@@ -83,7 +84,7 @@
             "text": {
               "expr": {
                 "Literal": {
-                  "Value": "'Clients par pays et cycle de vie'"
+                  "Value": "'Conversion par appareil'"
                 }
               }
             }

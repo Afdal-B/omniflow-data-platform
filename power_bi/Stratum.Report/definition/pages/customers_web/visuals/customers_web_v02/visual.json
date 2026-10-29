@@ -2,11 +2,11 @@
   "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/1.5.0/schema.json",
   "name": "customers_web_v02",
   "position": {
-    "x": 520,
-    "y": 16,
+    "x": 24,
+    "y": 92,
     "z": 2000,
-    "width": 236,
-    "height": 104,
+    "width": 296,
+    "height": 92,
     "tabOrder": 2000
   },
   "visual": {
@@ -23,11 +23,12 @@
                       "Entity": "_Measures"
                     }
                   },
-                  "Property": "Cart Abandonment Rate"
+                  "Property": "Sessions"
                 }
               },
-              "queryRef": "_Measures.Cart Abandonment Rate",
-              "nativeQueryRef": "Cart Abandonment Rate"
+              "queryRef": "_Measures.Sessions",
+              "nativeQueryRef": "Sessions",
+              "displayName": "Visites"
             }
           ]
         }

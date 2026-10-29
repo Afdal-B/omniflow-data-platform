@@ -2,36 +2,49 @@
   "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/1.5.0/schema.json",
   "name": "customers_web_v00",
   "position": {
-    "x": 16,
-    "y": 16,
+    "x": 24,
+    "y": 18,
     "z": 0,
-    "width": 236,
-    "height": 104,
+    "width": 820,
+    "height": 60,
     "tabOrder": 0
   },
   "visual": {
-    "visualType": "card",
-    "query": {
-      "queryState": {
-        "Values": {
-          "projections": [
-            {
-              "field": {
-                "Measure": {
-                  "Expression": {
-                    "SourceRef": {
-                      "Entity": "_Measures"
+    "visualType": "textbox",
+    "objects": {
+      "general": [
+        {
+          "properties": {
+            "paragraphs": [
+              {
+                "textRuns": [
+                  {
+                    "value": "Clients & web",
+                    "textStyle": {
+                      "fontSize": "20pt",
+                      "color": "#111827",
+                      "fontFamily": "Segoe UI",
+                      "fontWeight": "bold"
                     }
-                  },
-                  "Property": "Sessions"
-                }
+                  }
+                ]
               },
-              "queryRef": "_Measures.Sessions",
-              "nativeQueryRef": "Sessions"
-            }
-          ]
+              {
+                "textRuns": [
+                  {
+                    "value": "Parcours de visite, conversion et fidélité des clients",
+                    "textStyle": {
+                      "fontSize": "10pt",
+                      "color": "#6B7280",
+                      "fontFamily": "Segoe UI"
+                    }
+                  }
+                ]
+              }
+            ]
+          }
         }
-      }
+      ]
     }
   }
 }

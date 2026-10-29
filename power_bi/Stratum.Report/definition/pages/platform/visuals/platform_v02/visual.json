@@ -2,11 +2,11 @@
   "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/1.5.0/schema.json",
   "name": "platform_v02",
   "position": {
-    "x": 520,
-    "y": 16,
+    "x": 24,
+    "y": 92,
     "z": 2000,
-    "width": 236,
-    "height": 104,
+    "width": 296,
+    "height": 92,
     "tabOrder": 2000
   },
   "visual": {
@@ -23,11 +23,12 @@
                       "Entity": "_Measures"
                     }
                   },
-                  "Property": "Rows Ingested"
+                  "Property": "Pipeline Runs"
                 }
               },
-              "queryRef": "_Measures.Rows Ingested",
-              "nativeQueryRef": "Rows Ingested"
+              "queryRef": "_Measures.Pipeline Runs",
+              "nativeQueryRef": "Pipeline Runs",
+              "displayName": "Exécutions"
             }
           ]
         }

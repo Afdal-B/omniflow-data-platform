@@ -99,10 +99,11 @@ table dim_customers
 		mode: import
 		source =
 				let
+				    ToUtc = (value) => if value = null then null else if Value.Is(value, type datetimezone) then DateTimeZone.RemoveZone(DateTimeZone.ToUtc(value)) else value,
 				    Source = PostgreSQL.Database(WarehouseServer, WarehouseDatabase),
 				    Data = Source{[Schema = "marts", Item = "dim_customers"]}[Data],
 				    Numbers = Table.TransformColumnTypes(Data, {{"lifetime_revenue", type number}}),
-				    Utc = Table.TransformColumns(Numbers, {{"customer_since", each if _ = null then null else DateTimeZone.RemoveZone(DateTimeZone.ToUtc(_)), type datetime}, {"first_order_at", each if _ = null then null else DateTimeZone.RemoveZone(DateTimeZone.ToUtc(_)), type datetime}, {"last_order_at", each if _ = null then null else DateTimeZone.RemoveZone(DateTimeZone.ToUtc(_)), type datetime}})
+				    Utc = Table.TransformColumns(Numbers, {{"customer_since", ToUtc, type datetime}, {"first_order_at", ToUtc, type datetime}, {"last_order_at", ToUtc, type datetime}})
 				in
 				    Utc
 

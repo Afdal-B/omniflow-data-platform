@@ -68,9 +68,10 @@ table fct_web_traffic_5min
 		mode: import
 		source =
 				let
+				    ToUtc = (value) => if value = null then null else if Value.Is(value, type datetimezone) then DateTimeZone.RemoveZone(DateTimeZone.ToUtc(value)) else value,
 				    Source = PostgreSQL.Database(WarehouseServer, WarehouseDatabase),
 				    Data = Source{[Schema = "marts", Item = "fct_web_traffic_5min"]}[Data],
-				    Utc = Table.TransformColumns(Data, {{"window_start", each if _ = null then null else DateTimeZone.RemoveZone(DateTimeZone.ToUtc(_)), type datetime}, {"window_end", each if _ = null then null else DateTimeZone.RemoveZone(DateTimeZone.ToUtc(_)), type datetime}})
+				    Utc = Table.TransformColumns(Data, {{"window_start", ToUtc, type datetime}, {"window_end", ToUtc, type datetime}})
 				in
 				    Utc
 

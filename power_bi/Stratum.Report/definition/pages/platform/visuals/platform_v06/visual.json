@@ -2,15 +2,15 @@
   "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/1.5.0/schema.json",
   "name": "platform_v06",
   "position": {
-    "x": 792,
-    "y": 136,
+    "x": 24,
+    "y": 200,
     "z": 6000,
-    "width": 472,
-    "height": 280,
+    "width": 752,
+    "height": 248,
     "tabOrder": 6000
   },
   "visual": {
-    "visualType": "clusteredBarChart",
+    "visualType": "columnChart",
     "query": {
       "queryState": {
         "Category": {
@@ -20,14 +20,34 @@
                 "Column": {
                   "Expression": {
                     "SourceRef": {
-                      "Entity": "fct_pipeline_rejections"
+                      "Entity": "dim_date"
                     }
                   },
-                  "Property": "rejection_reason"
+                  "Property": "date_day"
                 }
               },
-              "queryRef": "fct_pipeline_rejections.rejection_reason",
-              "nativeQueryRef": "rejection_reason"
+              "queryRef": "dim_date.date_day",
+              "nativeQueryRef": "date_day",
+              "displayName": "Jour"
+            }
+          ]
+        },
+        "Series": {
+          "projections": [
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "fct_pipeline_runs"
+                    }
+                  },
+                  "Property": "pipeline_name"
+                }
+              },
+              "queryRef": "fct_pipeline_runs.pipeline_name",
+              "nativeQueryRef": "pipeline_name",
+              "displayName": "Pipeline"
             }
           ]
         },
@@ -41,11 +61,12 @@
                       "Entity": "_Measures"
                     }
                   },
-                  "Property": "Rejected Rows by Rule"
+                  "Property": "Rows Ingested"
                 }
               },
-              "queryRef": "_Measures.Rejected Rows by Rule",
-              "nativeQueryRef": "Rejected Rows by Rule"
+              "queryRef": "_Measures.Rows Ingested",
+              "nativeQueryRef": "Rows Ingested",
+              "displayName": "Lignes ingérées"
             }
           ]
         }
@@ -65,7 +86,7 @@
             "text": {
               "expr": {
                 "Literal": {
-                  "Value": "'Rejets par règle qualité'"
+                  "Value": "'Lignes ingérées par jour'"
                 }
               }
             }

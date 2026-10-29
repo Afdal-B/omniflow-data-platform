@@ -2,11 +2,11 @@
   "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/1.5.0/schema.json",
   "name": "platform_v04",
   "position": {
-    "x": 1024,
-    "y": 16,
+    "x": 648,
+    "y": 92,
     "z": 4000,
-    "width": 236,
-    "height": 104,
+    "width": 296,
+    "height": 92,
     "tabOrder": 4000
   },
   "visual": {
@@ -23,11 +23,12 @@
                       "Entity": "_Measures"
                     }
                   },
-                  "Property": "Estimated Monthly Cost (USD)"
+                  "Property": "DLQ Rate"
                 }
               },
-              "queryRef": "_Measures.Estimated Monthly Cost (USD)",
-              "nativeQueryRef": "Estimated Monthly Cost (USD)"
+              "queryRef": "_Measures.DLQ Rate",
+              "nativeQueryRef": "DLQ Rate",
+              "displayName": "Taux de rejet (DLQ)"
             }
           ]
         }

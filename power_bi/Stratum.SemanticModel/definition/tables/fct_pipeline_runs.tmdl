@@ -159,10 +159,11 @@ table fct_pipeline_runs
 		mode: import
 		source =
 				let
+				    ToUtc = (value) => if value = null then null else if Value.Is(value, type datetimezone) then DateTimeZone.RemoveZone(DateTimeZone.ToUtc(value)) else value,
 				    Source = PostgreSQL.Database(WarehouseServer, WarehouseDatabase),
 				    Data = Source{[Schema = "marts", Item = "fct_pipeline_runs"]}[Data],
 				    Numbers = Table.TransformColumnTypes(Data, {{"duration_seconds", type number}, {"dlq_rate", type number}, {"estimated_cost_usd", type number}}),
-				    Utc = Table.TransformColumns(Numbers, {{"started_at", each if _ = null then null else DateTimeZone.RemoveZone(DateTimeZone.ToUtc(_)), type datetime}, {"finished_at", each if _ = null then null else DateTimeZone.RemoveZone(DateTimeZone.ToUtc(_)), type datetime}})
+				    Utc = Table.TransformColumns(Numbers, {{"started_at", ToUtc, type datetime}, {"finished_at", ToUtc, type datetime}})
 				in
 				    Utc
 

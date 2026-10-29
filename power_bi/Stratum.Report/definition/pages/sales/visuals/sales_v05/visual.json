@@ -2,36 +2,18 @@
   "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/1.5.0/schema.json",
   "name": "sales_v05",
   "position": {
-    "x": 16,
-    "y": 136,
+    "x": 960,
+    "y": 92,
     "z": 5000,
-    "width": 760,
-    "height": 280,
+    "width": 296,
+    "height": 92,
     "tabOrder": 5000
   },
   "visual": {
-    "visualType": "lineChart",
+    "visualType": "card",
     "query": {
       "queryState": {
-        "Category": {
-          "projections": [
-            {
-              "field": {
-                "Column": {
-                  "Expression": {
-                    "SourceRef": {
-                      "Entity": "dim_date"
-                    }
-                  },
-                  "Property": "month_start_date"
-                }
-              },
-              "queryRef": "dim_date.month_start_date",
-              "nativeQueryRef": "month_start_date"
-            }
-          ]
-        },
-        "Y": {
+        "Values": {
           "projections": [
             {
               "field": {
@@ -41,51 +23,16 @@
                       "Entity": "_Measures"
                     }
                   },
-                  "Property": "Revenue"
+                  "Property": "Cancellation Rate"
                 }
               },
-              "queryRef": "_Measures.Revenue",
-              "nativeQueryRef": "Revenue"
-            },
-            {
-              "field": {
-                "Measure": {
-                  "Expression": {
-                    "SourceRef": {
-                      "Entity": "_Measures"
-                    }
-                  },
-                  "Property": "Revenue Previous Month"
-                }
-              },
-              "queryRef": "_Measures.Revenue Previous Month",
-              "nativeQueryRef": "Revenue Previous Month"
+              "queryRef": "_Measures.Cancellation Rate",
+              "nativeQueryRef": "Cancellation Rate",
+              "displayName": "Taux d'annulation"
             }
           ]
         }
       }
-    },
-    "visualContainerObjects": {
-      "title": [
-        {
-          "properties": {
-            "show": {
-              "expr": {
-                "Literal": {
-                  "Value": "true"
-                }
-              }
-            },
-            "text": {
-              "expr": {
-                "Literal": {
-                  "Value": "'Chiffre d'affaires par mois'"
-                }
-              }
-            }
-          }
-        }
-      ]
     }
   }
 }

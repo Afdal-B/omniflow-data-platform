@@ -127,10 +127,11 @@ table fct_order_items
 		mode: import
 		source =
 				let
+				    ToUtc = (value) => if value = null then null else if Value.Is(value, type datetimezone) then DateTimeZone.RemoveZone(DateTimeZone.ToUtc(value)) else value,
 				    Source = PostgreSQL.Database(WarehouseServer, WarehouseDatabase),
 				    Data = Source{[Schema = "marts", Item = "fct_order_items"]}[Data],
 				    Numbers = Table.TransformColumnTypes(Data, {{"unit_price", type number}, {"discount_amount", type number}, {"line_gross_amount", type number}, {"line_net_amount", type number}}),
-				    Utc = Table.TransformColumns(Numbers, {{"item_updated_at", each if _ = null then null else DateTimeZone.RemoveZone(DateTimeZone.ToUtc(_)), type datetime}})
+				    Utc = Table.TransformColumns(Numbers, {{"item_updated_at", ToUtc, type datetime}})
 				in
 				    Utc
 

@@ -1,0 +1,79 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/1.5.0/schema.json",
+  "name": "customers_web_v09",
+  "position": {
+    "x": 648,
+    "y": 464,
+    "z": 9000,
+    "width": 608,
+    "height": 232,
+    "tabOrder": 9000
+  },
+  "visual": {
+    "visualType": "lineChart",
+    "query": {
+      "queryState": {
+        "Category": {
+          "projections": [
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "fct_web_traffic_5min"
+                    }
+                  },
+                  "Property": "window_start"
+                }
+              },
+              "queryRef": "fct_web_traffic_5min.window_start",
+              "nativeQueryRef": "window_start",
+              "displayName": "Fenêtre"
+            }
+          ]
+        },
+        "Y": {
+          "projections": [
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "_Measures"
+                    }
+                  },
+                  "Property": "Visitors (5-min windows)"
+                }
+              },
+              "queryRef": "_Measures.Visitors (5-min windows)",
+              "nativeQueryRef": "Visitors (5-min windows)",
+              "displayName": "Visiteurs"
+            }
+          ]
+        }
+      }
+    },
+    "visualContainerObjects": {
+      "title": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "true"
+                }
+              }
+            },
+            "text": {
+              "expr": {
+                "Literal": {
+                  "Value": "'Trafic : visiteurs par fenêtre de 5 minutes'"
+                }
+              }
+            }
+          }
+        }
+      ]
+    }
+  }
+}

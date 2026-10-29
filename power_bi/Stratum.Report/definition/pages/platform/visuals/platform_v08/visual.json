@@ -1,0 +1,167 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/1.5.0/schema.json",
+  "name": "platform_v08",
+  "position": {
+    "x": 24,
+    "y": 464,
+    "z": 8000,
+    "width": 1232,
+    "height": 232,
+    "tabOrder": 8000
+  },
+  "visual": {
+    "visualType": "tableEx",
+    "query": {
+      "queryState": {
+        "Values": {
+          "projections": [
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "fct_pipeline_runs"
+                    }
+                  },
+                  "Property": "pipeline_name"
+                }
+              },
+              "queryRef": "fct_pipeline_runs.pipeline_name",
+              "nativeQueryRef": "pipeline_name",
+              "displayName": "Pipeline"
+            },
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "_Measures"
+                    }
+                  },
+                  "Property": "Pipeline Runs"
+                }
+              },
+              "queryRef": "_Measures.Pipeline Runs",
+              "nativeQueryRef": "Pipeline Runs",
+              "displayName": "Exécutions"
+            },
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "_Measures"
+                    }
+                  },
+                  "Property": "Failed Runs"
+                }
+              },
+              "queryRef": "_Measures.Failed Runs",
+              "nativeQueryRef": "Failed Runs",
+              "displayName": "Échecs"
+            },
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "_Measures"
+                    }
+                  },
+                  "Property": "DLQ Rate"
+                }
+              },
+              "queryRef": "_Measures.DLQ Rate",
+              "nativeQueryRef": "DLQ Rate",
+              "displayName": "Taux de rejet (DLQ)"
+            },
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "_Measures"
+                    }
+                  },
+                  "Property": "Avg Run Duration (s)"
+                }
+              },
+              "queryRef": "_Measures.Avg Run Duration (s)",
+              "nativeQueryRef": "Avg Run Duration (s)",
+              "displayName": "Durée moyenne (s)"
+            },
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "_Measures"
+                    }
+                  },
+                  "Property": "P95 Run Duration (s)"
+                }
+              },
+              "queryRef": "_Measures.P95 Run Duration (s)",
+              "nativeQueryRef": "P95 Run Duration (s)",
+              "displayName": "Durée P95 (s)"
+            },
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "_Measures"
+                    }
+                  },
+                  "Property": "Estimated Cost (USD)"
+                }
+              },
+              "queryRef": "_Measures.Estimated Cost (USD)",
+              "nativeQueryRef": "Estimated Cost (USD)",
+              "displayName": "Coût estimé"
+            }
+          ]
+        }
+      },
+      "sortDefinition": {
+        "sort": [
+          {
+            "field": {
+              "Measure": {
+                "Expression": {
+                  "SourceRef": {
+                    "Entity": "_Measures"
+                  }
+                },
+                "Property": "Pipeline Runs"
+              }
+            },
+            "direction": "Descending"
+          }
+        ]
+      }
+    },
+    "visualContainerObjects": {
+      "title": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "true"
+                }
+              }
+            },
+            "text": {
+              "expr": {
+                "Literal": {
+                  "Value": "'Performance et coût estimé par pipeline'"
+                }
+              }
+            }
+          }
+        }
+      ]
+    }
+  }
+}

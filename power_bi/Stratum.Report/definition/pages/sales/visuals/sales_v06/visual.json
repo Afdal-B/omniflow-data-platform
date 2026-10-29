@@ -2,15 +2,15 @@
   "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/1.5.0/schema.json",
   "name": "sales_v06",
   "position": {
-    "x": 792,
-    "y": 136,
+    "x": 24,
+    "y": 200,
     "z": 6000,
-    "width": 472,
-    "height": 280,
+    "width": 752,
+    "height": 248,
     "tabOrder": 6000
   },
   "visual": {
-    "visualType": "donutChart",
+    "visualType": "lineChart",
     "query": {
       "queryState": {
         "Category": {
@@ -20,14 +20,15 @@
                 "Column": {
                   "Expression": {
                     "SourceRef": {
-                      "Entity": "fct_orders"
+                      "Entity": "dim_date"
                     }
                   },
-                  "Property": "channel"
+                  "Property": "month_start_date"
                 }
               },
-              "queryRef": "fct_orders.channel",
-              "nativeQueryRef": "channel"
+              "queryRef": "dim_date.month_start_date",
+              "nativeQueryRef": "month_start_date",
+              "displayName": "Mois"
             }
           ]
         },
@@ -45,7 +46,23 @@
                 }
               },
               "queryRef": "_Measures.Revenue",
-              "nativeQueryRef": "Revenue"
+              "nativeQueryRef": "Revenue",
+              "displayName": "Chiffre d'affaires"
+            },
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "_Measures"
+                    }
+                  },
+                  "Property": "Revenue Previous Month"
+                }
+              },
+              "queryRef": "_Measures.Revenue Previous Month",
+              "nativeQueryRef": "Revenue Previous Month",
+              "displayName": "Mois précédent"
             }
           ]
         }
@@ -65,7 +82,7 @@
             "text": {
               "expr": {
                 "Literal": {
-                  "Value": "'Chiffre d'affaires par canal'"
+                  "Value": "'Évolution mensuelle du chiffre d'affaires'"
                 }
               }
             }

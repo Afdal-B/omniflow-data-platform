@@ -165,10 +165,11 @@ table fct_sessions
 		mode: import
 		source =
 				let
+				    ToUtc = (value) => if value = null then null else if Value.Is(value, type datetimezone) then DateTimeZone.RemoveZone(DateTimeZone.ToUtc(value)) else value,
 				    Source = PostgreSQL.Database(WarehouseServer, WarehouseDatabase),
 				    Data = Source{[Schema = "marts", Item = "fct_sessions"]}[Data],
 				    Numbers = Table.TransformColumnTypes(Data, {{"duration_seconds", type number}}),
-				    Utc = Table.TransformColumns(Numbers, {{"session_started_at", each if _ = null then null else DateTimeZone.RemoveZone(DateTimeZone.ToUtc(_)), type datetime}, {"session_ended_at", each if _ = null then null else DateTimeZone.RemoveZone(DateTimeZone.ToUtc(_)), type datetime}})
+				    Utc = Table.TransformColumns(Numbers, {{"session_started_at", ToUtc, type datetime}, {"session_ended_at", ToUtc, type datetime}})
 				in
 				    Utc
 

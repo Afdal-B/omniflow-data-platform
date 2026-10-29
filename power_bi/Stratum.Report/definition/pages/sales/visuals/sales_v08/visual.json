@@ -2,18 +2,18 @@
   "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/1.5.0/schema.json",
   "name": "sales_v08",
   "position": {
-    "x": 648,
-    "y": 432,
+    "x": 24,
+    "y": 464,
     "z": 8000,
-    "width": 616,
-    "height": 272,
+    "width": 608,
+    "height": 232,
     "tabOrder": 8000
   },
   "visual": {
-    "visualType": "tableEx",
+    "visualType": "clusteredBarChart",
     "query": {
       "queryState": {
-        "Values": {
+        "Category": {
           "projections": [
             {
               "field": {
@@ -23,12 +23,17 @@
                       "Entity": "dim_products"
                     }
                   },
-                  "Property": "product_name"
+                  "Property": "category"
                 }
               },
-              "queryRef": "dim_products.product_name",
-              "nativeQueryRef": "product_name"
-            },
+              "queryRef": "dim_products.category",
+              "nativeQueryRef": "category",
+              "displayName": "Catégorie"
+            }
+          ]
+        },
+        "Y": {
+          "projections": [
             {
               "field": {
                 "Measure": {
@@ -41,24 +46,28 @@
                 }
               },
               "queryRef": "_Measures.Product Revenue",
-              "nativeQueryRef": "Product Revenue"
-            },
-            {
-              "field": {
-                "Measure": {
-                  "Expression": {
-                    "SourceRef": {
-                      "Entity": "_Measures"
-                    }
-                  },
-                  "Property": "Units Sold"
-                }
-              },
-              "queryRef": "_Measures.Units Sold",
-              "nativeQueryRef": "Units Sold"
+              "nativeQueryRef": "Product Revenue",
+              "displayName": "Chiffre d'affaires"
             }
           ]
         }
+      },
+      "sortDefinition": {
+        "sort": [
+          {
+            "field": {
+              "Measure": {
+                "Expression": {
+                  "SourceRef": {
+                    "Entity": "_Measures"
+                  }
+                },
+                "Property": "Product Revenue"
+              }
+            },
+            "direction": "Descending"
+          }
+        ]
       }
     },
     "visualContainerObjects": {
@@ -75,7 +84,7 @@
             "text": {
               "expr": {
                 "Literal": {
-                  "Value": "'Produits'"
+                  "Value": "'Chiffre d'affaires par catégorie'"
                 }
               }
             }

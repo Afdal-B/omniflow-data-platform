@@ -2,11 +2,11 @@
   "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/1.5.0/schema.json",
   "name": "customers_web_v03",
   "position": {
-    "x": 772,
-    "y": 16,
+    "x": 336,
+    "y": 92,
     "z": 3000,
-    "width": 236,
-    "height": 104,
+    "width": 296,
+    "height": 92,
     "tabOrder": 3000
   },
   "visual": {
@@ -23,11 +23,12 @@
                       "Entity": "_Measures"
                     }
                   },
-                  "Property": "Returning Customer Share"
+                  "Property": "Conversion Rate"
                 }
               },
-              "queryRef": "_Measures.Returning Customer Share",
-              "nativeQueryRef": "Returning Customer Share"
+              "queryRef": "_Measures.Conversion Rate",
+              "nativeQueryRef": "Conversion Rate",
+              "displayName": "Taux de conversion"
             }
           ]
         }

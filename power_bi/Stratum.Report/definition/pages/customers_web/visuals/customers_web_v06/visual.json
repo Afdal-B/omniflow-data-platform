@@ -2,35 +2,17 @@
   "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/1.5.0/schema.json",
   "name": "customers_web_v06",
   "position": {
-    "x": 648,
-    "y": 136,
+    "x": 24,
+    "y": 200,
     "z": 6000,
-    "width": 616,
-    "height": 280,
+    "width": 752,
+    "height": 248,
     "tabOrder": 6000
   },
   "visual": {
-    "visualType": "clusteredColumnChart",
+    "visualType": "clusteredBarChart",
     "query": {
       "queryState": {
-        "Category": {
-          "projections": [
-            {
-              "field": {
-                "Column": {
-                  "Expression": {
-                    "SourceRef": {
-                      "Entity": "fct_sessions"
-                    }
-                  },
-                  "Property": "device"
-                }
-              },
-              "queryRef": "fct_sessions.device",
-              "nativeQueryRef": "device"
-            }
-          ]
-        },
         "Y": {
           "projections": [
             {
@@ -41,11 +23,72 @@
                       "Entity": "_Measures"
                     }
                   },
-                  "Property": "Conversion Rate"
+                  "Property": "Sessions"
                 }
               },
-              "queryRef": "_Measures.Conversion Rate",
-              "nativeQueryRef": "Conversion Rate"
+              "queryRef": "_Measures.Sessions",
+              "nativeQueryRef": "Sessions",
+              "displayName": "Visites"
+            },
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "_Measures"
+                    }
+                  },
+                  "Property": "Sessions With Product View"
+                }
+              },
+              "queryRef": "_Measures.Sessions With Product View",
+              "nativeQueryRef": "Sessions With Product View",
+              "displayName": "Produit consulté"
+            },
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "_Measures"
+                    }
+                  },
+                  "Property": "Sessions With Cart"
+                }
+              },
+              "queryRef": "_Measures.Sessions With Cart",
+              "nativeQueryRef": "Sessions With Cart",
+              "displayName": "Ajout au panier"
+            },
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "_Measures"
+                    }
+                  },
+                  "Property": "Sessions With Checkout"
+                }
+              },
+              "queryRef": "_Measures.Sessions With Checkout",
+              "nativeQueryRef": "Sessions With Checkout",
+              "displayName": "Paiement commencé"
+            },
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "_Measures"
+                    }
+                  },
+                  "Property": "Converted Sessions"
+                }
+              },
+              "queryRef": "_Measures.Converted Sessions",
+              "nativeQueryRef": "Converted Sessions",
+              "displayName": "Achat"
             }
           ]
         }
@@ -65,7 +108,7 @@
             "text": {
               "expr": {
                 "Literal": {
-                  "Value": "'Conversion par appareil'"
+                  "Value": "'Entonnoir de conversion'"
                 }
               }
             }
