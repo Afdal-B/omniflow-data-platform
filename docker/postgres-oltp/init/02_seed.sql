@@ -27,21 +27,39 @@ VALUES
     ('k.schmidt@example.com', 'Klaus', 'Schmidt', 'germany', 'consumer'),
     ('b2b.buyer@example.com', 'Paul', 'Lambert', 'FR', 'enterprise');
 
+WITH catalog (position, category, adjectives, nouns) AS (
+    VALUES
+        (0, 'electronics',
+            ARRAY['Wireless', 'Smart', 'Compact', 'Pro', 'Ultra', 'Portable', 'Premium', 'Essential'],
+            ARRAY['Headphones', 'Speaker', 'Smartwatch', 'Charger', 'Webcam']),
+        (1, 'home',
+            ARRAY['Cozy', 'Classic', 'Nordic', 'Minimal', 'Rustic', 'Modern', 'Handmade', 'Scandinavian'],
+            ARRAY['Lamp', 'Mug', 'Cushion', 'Vase', 'Blanket']),
+        (2, 'fashion',
+            ARRAY['Urban', 'Classic', 'Organic', 'Vintage', 'Slim', 'Oversized', 'Waterproof', 'Essential'],
+            ARRAY['Jacket', 'Sneakers', 'Scarf', 'Backpack', 'Hoodie']),
+        (3, 'sports',
+            ARRAY['Pro', 'Lightweight', 'Eco', 'Performance', 'Classic', 'Ultra', 'Compact', 'Training'],
+            ARRAY['Yoga Mat', 'Water Bottle', 'Dumbbells', 'Running Shorts', 'Tennis Racket']),
+        (4, 'beauty',
+            ARRAY['Hydrating', 'Organic', 'Radiant', 'Gentle', 'Night', 'Rose', 'Daily', 'Soothing'],
+            ARRAY['Serum', 'Face Cream', 'Shampoo', 'Lipstick', 'Perfume']),
+        (5, 'books',
+            ARRAY['Bestselling', 'Illustrated', 'Classic', 'Modern', 'Pocket', 'Complete', 'Essential', 'Deluxe'],
+            ARRAY['Novel', 'Cookbook', 'Travel Guide', 'Biography', 'Comic Book'])
+)
 INSERT INTO shop.products (sku, product_name, category, unit_price, created_at, updated_at)
 SELECT
     'SKU-' || lpad(g::text, 5, '0'),
-    initcap(adj) || ' ' || noun,
-    category,
+    c.adjectives[1 + rank_in_category % 8] || ' ' || c.nouns[1 + rank_in_category / 8],
+    c.category,
     round((5 + random() * 145)::numeric, 2),
     now() - interval '18000 hours',
     now() - interval '18000 hours'
 FROM generate_series(1, 240) AS g
-CROSS JOIN LATERAL (
-    SELECT
-        (ARRAY['electronics', 'home', 'fashion', 'sports', 'beauty', 'books'])[1 + (g % 6)] AS category,
-        (ARRAY['essential', 'premium', 'compact', 'eco', 'urban', 'classic', 'smart', 'pro'])[1 + floor(random() * 8)::int] AS adj,
-        (ARRAY['Headphones', 'Lamp', 'Jacket', 'Sneakers', 'Serum', 'Novel', 'Backpack', 'Watch', 'Mug', 'Yoga Mat'])[1 + floor(random() * 10)::int] AS noun
-) AS p;
+CROSS JOIN LATERAL (SELECT (g - 1) / 6 AS rank_in_category) AS r
+JOIN catalog AS c ON c.position = g % 6
+ORDER BY g;
 
 WITH order_draws AS (
     SELECT

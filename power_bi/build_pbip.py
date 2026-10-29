@@ -570,6 +570,9 @@ def pages() -> list[Page]:
         },
         (left, main_y, WIDE, main_h),
         "Lignes ingérées par jour",
+        objects={
+            "categoryAxis": [{"properties": {"axisType": literal("'Categorical'")}}]
+        },
     )
     platform.add(
         "clusteredBarChart",
@@ -580,6 +583,7 @@ def pages() -> list[Page]:
         (right, main_y, NARROW, main_h),
         "Rejets par règle qualité",
         sort_by=f"{m}.Rejected Rows by Rule",
+        objects={"categoryAxis": [{"properties": {"maxMarginFactor": literal("45D")}}]},
     )
     platform.add(
         "tableEx",
