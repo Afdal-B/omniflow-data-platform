@@ -3,10 +3,10 @@
   "name": "customers_web_v08",
   "position": {
     "x": 24,
-    "y": 464,
+    "y": 440,
     "z": 8000,
     "width": 608,
-    "height": 232,
+    "height": 256,
     "tabOrder": 8000
   },
   "visual": {

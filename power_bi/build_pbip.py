@@ -343,7 +343,63 @@ def literal(value: str) -> dict:
 MARGIN, GAP, PAGE_WIDTH, PAGE_HEIGHT = 24, 16, 1280, 720
 CONTENT = PAGE_WIDTH - 2 * MARGIN
 WIDE, NARROW, HALF = 752, CONTENT - 752 - GAP, (CONTENT - GAP) // 2
-ROW_KPI, ROW_MAIN, ROW_BOTTOM = (92, 92), (200, 248), (464, 232)
+ROW_KPI, ROW_MAIN, ROW_BOTTOM = (92, 92), (200, 224), (440, 256)
+
+
+def column_widths(widths: dict[str, int]) -> list[dict]:
+    return [
+        {"properties": {"value": literal(f"{w}D")}, "selector": {"metadata": ref}}
+        for ref, w in widths.items()
+    ]
+
+
+def top_n(column: str, measure: str, n: int) -> dict:
+    entity, prop = column.split(".", 1)
+    target = {
+        "Column": {"Expression": {"SourceRef": {"Source": "d"}}, "Property": prop}
+    }
+    ranking = {
+        "Measure": {
+            "Expression": {"SourceRef": {"Source": "m"}},
+            "Property": measure.split(".", 1)[1],
+        }
+    }
+    subquery = {
+        "Version": 2,
+        "From": [
+            {"Name": "d", "Entity": entity, "Type": 0},
+            {"Name": "m", "Entity": MEASURES_TABLE, "Type": 0},
+        ],
+        "Select": [{**target, "Name": "field"}],
+        "OrderBy": [{"Direction": 2, "Expression": ranking}],
+        "Top": n,
+    }
+    return {
+        "name": tag("topn", column, measure).replace("-", "")[:20],
+        "field": field(entity, prop, "Column"),
+        "type": "TopN",
+        "filter": {
+            "Version": 2,
+            "From": [
+                {
+                    "Name": "subquery",
+                    "Expression": {"Subquery": {"Query": subquery}},
+                    "Type": 2,
+                },
+                {"Name": "d", "Entity": entity, "Type": 0},
+            ],
+            "Where": [
+                {
+                    "Condition": {
+                        "In": {
+                            "Expressions": [target],
+                            "Table": {"SourceRef": {"Source": "subquery"}},
+                        }
+                    }
+                }
+            ],
+        },
+    }
 
 
 class Page:
@@ -378,6 +434,7 @@ class Page:
         title: str = "",
         sort_by: str | None = None,
         objects: dict | None = None,
+        filters: list[dict] | None = None,
     ) -> None:
         query: dict = {
             "queryState": {
@@ -408,6 +465,8 @@ class Page:
                 ]
             }
         self._append(visual, box)
+        if filters:
+            self.visuals[-1]["filterConfig"] = {"filters": filters}
 
     def _header(self) -> None:
         def run(text: str, size: str, color: str, bold: bool = False) -> dict:
@@ -434,7 +493,7 @@ class Page:
             objects={"data": [{"properties": {"mode": literal("'Between'")}}]},
         )
 
-    def kpis(self, measures: list[str]) -> None:
+    def kpis(self, measures: list[str], one_decimal: tuple[str, ...] = ()) -> None:
         y, h = ROW_KPI
         width = (CONTENT - GAP * (len(measures) - 1)) // len(measures)
         for i, measure in enumerate(measures):
@@ -442,6 +501,11 @@ class Page:
                 "card",
                 {"Values": [f"{MEASURES_TABLE}.{measure}"]},
                 (MARGIN + i * (width + GAP), y, width, h),
+                objects=(
+                    {"labels": [{"properties": {"labelPrecision": literal("1L")}}]}
+                    if measure in one_decimal
+                    else None
+                ),
             )
 
 
@@ -457,7 +521,10 @@ def pages() -> list[Page]:
         "Ventes",
         "Chiffre d'affaires des commandes payées, expédiées ou livrées",
     )
-    sales.kpis(["Revenue", "Orders", "Average Order Value", "Cancellation Rate"])
+    sales.kpis(
+        ["Revenue", "Orders", "Average Order Value", "Cancellation Rate"],
+        one_decimal=("Revenue", "Orders"),
+    )
     sales.add(
         "lineChart",
         {
@@ -492,8 +559,20 @@ def pages() -> list[Page]:
             ]
         },
         (half_right, bottom_y, HALF, bottom_h),
-        "Meilleurs produits",
+        "Top 5 des produits",
         sort_by=f"{m}.Product Revenue",
+        objects={
+            "total": [{"properties": {"totals": literal("false")}}],
+            "columnWidth": column_widths(
+                {
+                    "dim_products.product_name": 210,
+                    "dim_products.category": 110,
+                    f"{m}.Product Revenue": 140,
+                    f"{m}.Units Sold": 110,
+                }
+            ),
+        },
+        filters=[top_n("dim_products.product_name", f"{m}.Product Revenue", 5)],
     )
 
     web = Page(
@@ -507,7 +586,8 @@ def pages() -> list[Page]:
             "Conversion Rate",
             "Cart Abandonment Rate",
             "Returning Customer Share",
-        ]
+        ],
+        one_decimal=("Sessions",),
     )
     funnel = [
         f"{m}.{step}"
@@ -520,7 +600,7 @@ def pages() -> list[Page]:
         )
     ]
     web.add(
-        "clusteredBarChart",
+        "funnel",
         {"Y": funnel},
         (left, main_y, WIDE, main_h),
         "Entonnoir de conversion",
@@ -601,6 +681,19 @@ def pages() -> list[Page]:
         (left, bottom_y, CONTENT, bottom_h),
         "Performance et coût estimé par pipeline",
         sort_by=f"{m}.Pipeline Runs",
+        objects={
+            "columnWidth": column_widths(
+                {
+                    "fct_pipeline_runs.pipeline_name": 230,
+                    f"{m}.Pipeline Runs": 140,
+                    f"{m}.Failed Runs": 120,
+                    f"{m}.DLQ Rate": 180,
+                    f"{m}.Avg Run Duration (s)": 180,
+                    f"{m}.P95 Run Duration (s)": 170,
+                    f"{m}.Estimated Cost (USD)": 160,
+                }
+            )
+        },
     )
     return [sales, web, platform]  # fmt: skip
 

@@ -82,7 +82,7 @@ DEFINE
         COUNTROWS ( fct_pipeline_runs )
 
     MEASURE '_Measures'[Failed Runs] =
-        CALCULATE ( COUNTROWS ( fct_pipeline_runs ), fct_pipeline_runs[is_success] = FALSE () )
+        CALCULATE ( COUNTROWS ( fct_pipeline_runs ), fct_pipeline_runs[is_success] = FALSE () ) + 0
 
     MEASURE '_Measures'[Success Rate] =
         DIVIDE ( [Pipeline Runs] - [Failed Runs], [Pipeline Runs] )

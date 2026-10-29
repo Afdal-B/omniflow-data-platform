@@ -175,7 +175,7 @@ table '_Measures'
 		lineageTag: 39a1b4df-bee1-5279-ba30-801d72a995fb
 
 	measure 'Failed Runs' = ```
-			CALCULATE ( COUNTROWS ( fct_pipeline_runs ), fct_pipeline_runs[is_success] = FALSE () )
+			CALCULATE ( COUNTROWS ( fct_pipeline_runs ), fct_pipeline_runs[is_success] = FALSE () ) + 0
 			```
 		formatString: #,0
 		displayFolder: Platform & FinOps
