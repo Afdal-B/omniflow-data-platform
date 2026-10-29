@@ -1,0 +1,77 @@
+table fct_web_traffic_5min
+	lineageTag: 06b46320-2df1-5de7-a613-0365019ac4a6
+
+	column window_start
+		dataType: dateTime
+		formatString: yyyy-mm-dd hh:nn:ss
+		lineageTag: ce430eaf-1dcd-55c2-83c4-0e925941687c
+		summarizeBy: none
+		sourceColumn: window_start
+
+		annotation SummarizationSetBy = Automatic
+
+	column window_end
+		dataType: dateTime
+		formatString: yyyy-mm-dd hh:nn:ss
+		lineageTag: 5a1449e7-7f10-55c7-abaf-60949686ecc4
+		summarizeBy: none
+		sourceColumn: window_end
+
+		annotation SummarizationSetBy = Automatic
+
+	column traffic_date
+		dataType: dateTime
+		formatString: yyyy-mm-dd
+		lineageTag: 43da8304-6119-5c1d-8a3c-e5a273cb6b46
+		summarizeBy: none
+		sourceColumn: traffic_date
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	column event_type
+		dataType: string
+		lineageTag: 21a02b97-21f6-570c-af4c-953d4214a49b
+		summarizeBy: none
+		sourceColumn: event_type
+
+		annotation SummarizationSetBy = Automatic
+
+	column device
+		dataType: string
+		lineageTag: d15a5cf3-3463-5ef1-bd0b-7edac1725655
+		summarizeBy: none
+		sourceColumn: device
+
+		annotation SummarizationSetBy = Automatic
+
+	column event_count
+		dataType: int64
+		formatString: 0
+		lineageTag: cfc6919a-4d74-53cd-9153-7638e926a8bc
+		summarizeBy: sum
+		sourceColumn: event_count
+
+		annotation SummarizationSetBy = Automatic
+
+	column unique_visitors
+		dataType: int64
+		formatString: 0
+		lineageTag: 25be2a4d-b06e-5470-a0e3-03ca1604bf2e
+		summarizeBy: sum
+		sourceColumn: unique_visitors
+
+		annotation SummarizationSetBy = Automatic
+
+	partition fct_web_traffic_5min = m
+		mode: import
+		source =
+				let
+				    Source = PostgreSQL.Database(WarehouseServer, WarehouseDatabase),
+				    Data = Source{[Schema = "marts", Item = "fct_web_traffic_5min"]}[Data],
+				    Utc = Table.TransformColumns(Data, {{"window_start", each if _ = null then null else DateTimeZone.RemoveZone(DateTimeZone.ToUtc(_)), type datetime}, {"window_end", each if _ = null then null else DateTimeZone.RemoveZone(DateTimeZone.ToUtc(_)), type datetime}})
+				in
+				    Utc
+
+	annotation PBI_ResultType = Table

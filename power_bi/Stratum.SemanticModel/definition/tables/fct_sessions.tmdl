@@ -1,0 +1,175 @@
+table fct_sessions
+	lineageTag: 4a05dcab-aa12-546c-93bf-82c6c15e8d08
+
+	column session_id
+		dataType: string
+		isHidden
+		lineageTag: ff0a667c-f67d-537b-9f0a-63367cf9ecbb
+		summarizeBy: none
+		sourceColumn: session_id
+
+		annotation SummarizationSetBy = Automatic
+
+	column anonymous_id
+		dataType: string
+		isHidden
+		lineageTag: e075eeb0-7fd8-5b7e-830e-8bcafc07f99d
+		summarizeBy: none
+		sourceColumn: anonymous_id
+
+		annotation SummarizationSetBy = Automatic
+
+	column customer_id
+		dataType: int64
+		formatString: 0
+		lineageTag: b6018f98-085e-5700-82ad-9029bc508769
+		summarizeBy: none
+		sourceColumn: customer_id
+
+		annotation SummarizationSetBy = Automatic
+
+	column session_started_at
+		dataType: dateTime
+		formatString: yyyy-mm-dd hh:nn:ss
+		lineageTag: 1e1fb2c5-14a8-5475-8e53-cf1b27c8810e
+		summarizeBy: none
+		sourceColumn: session_started_at
+
+		annotation SummarizationSetBy = Automatic
+
+	column session_ended_at
+		dataType: dateTime
+		formatString: yyyy-mm-dd hh:nn:ss
+		lineageTag: a8051bcc-6af3-5800-8ab1-d7dbbe9fb56e
+		summarizeBy: none
+		sourceColumn: session_ended_at
+
+		annotation SummarizationSetBy = Automatic
+
+	column session_date
+		dataType: dateTime
+		formatString: yyyy-mm-dd
+		lineageTag: 7dfebaf8-7d36-5ac9-a74c-74c65b2b37b4
+		summarizeBy: none
+		sourceColumn: session_date
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	column duration_seconds
+		dataType: double
+		lineageTag: c62c9e44-6758-5218-8c05-a60534b7144a
+		summarizeBy: sum
+		sourceColumn: duration_seconds
+
+		annotation SummarizationSetBy = Automatic
+
+	column event_count
+		dataType: int64
+		formatString: 0
+		lineageTag: c806f990-ada5-57e6-9c4e-95fc496a64dd
+		summarizeBy: sum
+		sourceColumn: event_count
+
+		annotation SummarizationSetBy = Automatic
+
+	column page_views
+		dataType: int64
+		formatString: 0
+		lineageTag: ab8015c3-a840-5154-b7e9-81a33f105c31
+		summarizeBy: sum
+		sourceColumn: page_views
+
+		annotation SummarizationSetBy = Automatic
+
+	column searches
+		dataType: int64
+		formatString: 0
+		lineageTag: 8ea626c1-069f-58d7-946d-8367cee86840
+		summarizeBy: sum
+		sourceColumn: searches
+
+		annotation SummarizationSetBy = Automatic
+
+	column product_views
+		dataType: int64
+		formatString: 0
+		lineageTag: 3a34dbd1-cf96-51d4-b29b-c8accd8bfee2
+		summarizeBy: sum
+		sourceColumn: product_views
+
+		annotation SummarizationSetBy = Automatic
+
+	column add_to_carts
+		dataType: int64
+		formatString: 0
+		lineageTag: 60dcfc55-b0c1-5e01-acc3-80f82fff94a3
+		summarizeBy: sum
+		sourceColumn: add_to_carts
+
+		annotation SummarizationSetBy = Automatic
+
+	column checkouts
+		dataType: int64
+		formatString: 0
+		lineageTag: cc141507-b2a0-5d6f-983b-e7aa2e3afdc3
+		summarizeBy: sum
+		sourceColumn: checkouts
+
+		annotation SummarizationSetBy = Automatic
+
+	column purchases
+		dataType: int64
+		formatString: 0
+		lineageTag: 35a1d15b-12c6-5b87-b593-c25fff958978
+		summarizeBy: sum
+		sourceColumn: purchases
+
+		annotation SummarizationSetBy = Automatic
+
+	column order_id
+		dataType: int64
+		formatString: 0
+		lineageTag: c90b5bd4-d688-5bc6-a966-ad6901d86f8d
+		summarizeBy: none
+		sourceColumn: order_id
+
+		annotation SummarizationSetBy = Automatic
+
+	column device
+		dataType: string
+		lineageTag: d608314e-2cbf-507e-a80f-bdab41084c19
+		summarizeBy: none
+		sourceColumn: device
+
+		annotation SummarizationSetBy = Automatic
+
+	column country_code
+		dataType: string
+		lineageTag: f13c186a-1159-528f-b035-c1dfa2d9e310
+		summarizeBy: none
+		sourceColumn: country_code
+
+		annotation SummarizationSetBy = Automatic
+
+	column is_converted
+		dataType: boolean
+		lineageTag: b358cb8a-3d13-5637-a269-2474c75f54da
+		summarizeBy: none
+		sourceColumn: is_converted
+
+		annotation SummarizationSetBy = Automatic
+
+	partition fct_sessions = m
+		mode: import
+		source =
+				let
+				    Source = PostgreSQL.Database(WarehouseServer, WarehouseDatabase),
+				    Data = Source{[Schema = "marts", Item = "fct_sessions"]}[Data],
+				    Numbers = Table.TransformColumnTypes(Data, {{"duration_seconds", type number}}),
+				    Utc = Table.TransformColumns(Numbers, {{"session_started_at", each if _ = null then null else DateTimeZone.RemoveZone(DateTimeZone.ToUtc(_)), type datetime}, {"session_ended_at", each if _ = null then null else DateTimeZone.RemoveZone(DateTimeZone.ToUtc(_)), type datetime}})
+				in
+				    Utc
+
+	annotation PBI_ResultType = Table

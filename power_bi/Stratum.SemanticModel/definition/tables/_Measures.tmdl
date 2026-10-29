@@ -1,0 +1,271 @@
+table '_Measures'
+	lineageTag: 4bc76771-54db-5ba7-a93a-a4ef17e7d6a2
+
+	measure Revenue = ```
+			CALCULATE ( SUM ( fct_orders[net_amount] ), fct_orders[is_revenue] = TRUE () )
+			```
+		formatString: #,0 €
+		displayFolder: Sales
+		lineageTag: 5a98e13f-6af7-51f5-ae9a-ad208c5d6627
+
+	measure Orders = ```
+			CALCULATE ( COUNTROWS ( fct_orders ), fct_orders[is_revenue] = TRUE () )
+			```
+		formatString: #,0
+		displayFolder: Sales
+		lineageTag: 2bdfef1f-a9cc-5645-b201-937c0fc8ddd8
+
+	measure 'Average Order Value' = ```
+			DIVIDE ( [Revenue], [Orders] )
+			```
+		formatString: #,0 €
+		displayFolder: Sales
+		lineageTag: a08ee480-c5e9-5306-96c8-83f2eca1098a
+
+	measure 'Revenue Previous Month' = ```
+			CALCULATE ( [Revenue], DATEADD ( dim_date[date_day], -1, MONTH ) )
+			```
+		formatString: #,0 €
+		displayFolder: Sales
+		lineageTag: db4c4c49-7e7c-54ae-bbc1-8e055c3b3830
+
+	measure 'Revenue MoM %' = ```
+			DIVIDE ( [Revenue] - [Revenue Previous Month], [Revenue Previous Month] )
+			```
+		formatString: 0.0%
+		displayFolder: Sales
+		lineageTag: fa845a92-db4c-5328-9e48-d9ed7b75cdc0
+
+	measure 'Active Customers' = ```
+			CALCULATE ( DISTINCTCOUNT ( fct_orders[customer_id] ), fct_orders[is_revenue] = TRUE () )
+			```
+		formatString: #,0
+		displayFolder: Sales
+		lineageTag: dbc6759d-479f-565f-baba-cf292835398e
+
+	measure 'Discount Rate' = ```
+			DIVIDE ( SUM ( fct_orders[discount_amount] ), SUM ( fct_orders[gross_amount] ) )
+			```
+		formatString: 0.0%
+		displayFolder: Sales
+		lineageTag: 60a63017-e74c-53ae-8f41-7fa63cdb4236
+
+	measure 'Cancellation Rate' = ```
+			DIVIDE (
+			            CALCULATE ( COUNTROWS ( fct_orders ), fct_orders[order_status] IN { "cancelled", "refunded" } ),
+			            COUNTROWS ( fct_orders )
+			        )
+			```
+		formatString: 0.0%
+		displayFolder: Sales
+		lineageTag: cb559d00-4c73-56e2-b5bb-fa6685f053b7
+
+	measure 'Product Revenue' = ```
+			CALCULATE ( SUM ( fct_order_items[line_net_amount] ), fct_order_items[is_revenue] = TRUE () )
+			```
+		formatString: #,0 €
+		displayFolder: Sales
+		lineageTag: 2263be8d-c052-5fe1-b51f-12f9e1a0b070
+
+	measure 'Units Sold' = ```
+			CALCULATE ( SUM ( fct_order_items[quantity] ), fct_order_items[is_revenue] = TRUE () )
+			```
+		formatString: #,0
+		displayFolder: Sales
+		lineageTag: fc3d4ab0-3c43-5acb-b9d3-cb0f0bbc475c
+
+	measure Customers = ```
+			COUNTROWS ( dim_customers )
+			```
+		formatString: #,0
+		displayFolder: Customers & web
+		lineageTag: 52017ef1-28b4-55d0-ad6e-f30df79db2d2
+
+	measure 'Returning Customer Share' = ```
+			DIVIDE (
+			            CALCULATE ( COUNTROWS ( dim_customers ), dim_customers[lifecycle_stage] = "returning" ),
+			            CALCULATE ( COUNTROWS ( dim_customers ), dim_customers[lifecycle_stage] <> "prospect" )
+			        )
+			```
+		formatString: 0.0%
+		displayFolder: Customers & web
+		lineageTag: 8e1d309f-9f7a-5d44-8c97-e50dea3264f3
+
+	measure 'Average Lifetime Value' = ```
+			AVERAGEX (
+			            FILTER ( dim_customers, dim_customers[lifetime_orders] > 0 ),
+			            dim_customers[lifetime_revenue]
+			        )
+			```
+		formatString: #,0 €
+		displayFolder: Customers & web
+		lineageTag: b2902b02-b926-5e88-ae9e-e5facbda5f7a
+
+	measure Sessions = ```
+			COUNTROWS ( fct_sessions )
+			```
+		formatString: #,0
+		displayFolder: Customers & web
+		lineageTag: ccc69aaf-ac12-50b4-bec3-a592dabdebc4
+
+	measure 'Sessions With Product View' = ```
+			CALCULATE ( COUNTROWS ( fct_sessions ), fct_sessions[product_views] > 0 )
+			```
+		formatString: #,0
+		displayFolder: Customers & web
+		lineageTag: 9ba44bda-5efb-56da-99df-b1101c87c60c
+
+	measure 'Sessions With Cart' = ```
+			CALCULATE ( COUNTROWS ( fct_sessions ), fct_sessions[add_to_carts] > 0 )
+			```
+		formatString: #,0
+		displayFolder: Customers & web
+		lineageTag: 94f93783-f247-5522-8f53-a82427063deb
+
+	measure 'Sessions With Checkout' = ```
+			CALCULATE ( COUNTROWS ( fct_sessions ), fct_sessions[checkouts] > 0 )
+			```
+		formatString: #,0
+		displayFolder: Customers & web
+		lineageTag: 8de80126-5992-52d2-af5d-b251755bda15
+
+	measure 'Converted Sessions' = ```
+			CALCULATE ( COUNTROWS ( fct_sessions ), fct_sessions[is_converted] = TRUE () )
+			```
+		formatString: #,0
+		displayFolder: Customers & web
+		lineageTag: a6e0d19c-f869-548b-a7b2-5cdfe039a83c
+
+	measure 'Conversion Rate' = ```
+			DIVIDE ( [Converted Sessions], [Sessions] )
+			```
+		formatString: 0.0%
+		displayFolder: Customers & web
+		lineageTag: d0928f40-b671-550b-b026-d2f95421043a
+
+	measure 'Cart Abandonment Rate' = ```
+			DIVIDE ( [Sessions With Cart] - [Converted Sessions], [Sessions With Cart] )
+			```
+		formatString: 0.0%
+		displayFolder: Customers & web
+		lineageTag: b9f44827-09b5-5794-8501-5e51838c685d
+
+	measure 'Avg Session Duration (min)' = ```
+			DIVIDE ( AVERAGE ( fct_sessions[duration_seconds] ), 60 )
+			```
+		formatString: #,0.0
+		displayFolder: Customers & web
+		lineageTag: 40b82287-0b69-5784-a721-ba74614a33f9
+
+	measure 'Visitors (5-min windows)' = ```
+			SUM ( fct_web_traffic_5min[unique_visitors] )
+			```
+		formatString: #,0
+		displayFolder: Customers & web
+		lineageTag: 348649d9-96da-5a75-89b7-bb6bdf107fcc
+
+	measure 'Pipeline Runs' = ```
+			COUNTROWS ( fct_pipeline_runs )
+			```
+		formatString: #,0
+		displayFolder: Platform & FinOps
+		lineageTag: 39a1b4df-bee1-5279-ba30-801d72a995fb
+
+	measure 'Failed Runs' = ```
+			CALCULATE ( COUNTROWS ( fct_pipeline_runs ), fct_pipeline_runs[is_success] = FALSE () )
+			```
+		formatString: #,0
+		displayFolder: Platform & FinOps
+		lineageTag: 468919f6-cab3-5de8-b319-9491351def23
+
+	measure 'Success Rate' = ```
+			DIVIDE ( [Pipeline Runs] - [Failed Runs], [Pipeline Runs] )
+			```
+		formatString: 0.0%
+		displayFolder: Platform & FinOps
+		lineageTag: 30e4ef98-309a-5aa7-b983-6ce2859b0454
+
+	measure 'Rows Ingested' = ```
+			SUM ( fct_pipeline_runs[rows_valid] )
+			```
+		formatString: #,0
+		displayFolder: Platform & FinOps
+		lineageTag: 1225baa6-7689-5145-a588-ae0f4ce19d59
+
+	measure 'Rows Rejected' = ```
+			SUM ( fct_pipeline_runs[rows_rejected] )
+			```
+		formatString: #,0
+		displayFolder: Platform & FinOps
+		lineageTag: 12cf8a8b-cb91-5a51-9a1c-14ac293abe53
+
+	measure 'DLQ Rate' = ```
+			DIVIDE ( [Rows Rejected], SUM ( fct_pipeline_runs[rows_read] ) )
+			```
+		formatString: 0.0%
+		displayFolder: Platform & FinOps
+		lineageTag: 25bb419c-d4b5-55c2-a437-30af20da1913
+
+	measure 'DLQ Status' = ```
+			SWITCH ( TRUE (), [DLQ Rate] >= 0.05, "Critical", [DLQ Rate] >= 0.02, "Warning", "OK" )
+			```
+		formatString: #,0
+		displayFolder: Platform & FinOps
+		lineageTag: a2383eee-e843-5479-ba78-68e869b5f58a
+
+	measure 'Avg Run Duration (s)' = ```
+			AVERAGE ( fct_pipeline_runs[duration_seconds] )
+			```
+		formatString: #,0.0
+		displayFolder: Platform & FinOps
+		lineageTag: dae05957-63c8-5506-a338-870194cde4d5
+
+	measure 'P95 Run Duration (s)' = ```
+			PERCENTILEX.INC ( fct_pipeline_runs, fct_pipeline_runs[duration_seconds], 0.95 )
+			```
+		formatString: #,0.0
+		displayFolder: Platform & FinOps
+		lineageTag: 128c031c-52d8-5518-85b6-1758cfcc40ec
+
+	measure 'Rejected Rows by Rule' = ```
+			SUM ( fct_pipeline_rejections[rejected_rows] )
+			```
+		formatString: #,0
+		displayFolder: Platform & FinOps
+		lineageTag: 26a3b4d3-68b2-515d-9036-c4148b52e1b0
+
+	measure 'Estimated Cost (USD)' = ```
+			SUM ( fct_pipeline_runs[estimated_cost_usd] )
+			```
+		formatString: \$#,0.0000
+		displayFolder: Platform & FinOps
+		lineageTag: 02a524f1-080d-51bb-9ca1-d5e12ce46696
+
+	measure 'Cost per Million Rows (USD)' = ```
+			DIVIDE ( [Estimated Cost (USD)], [Rows Ingested] / 1000000 )
+			```
+		formatString: \$#,0.0000
+		displayFolder: Platform & FinOps
+		lineageTag: 8699bcf9-b810-53d1-a2d1-30ac1813ab97
+
+	measure 'Estimated Monthly Cost (USD)' = ```
+			VAR days_covered = DISTINCTCOUNT ( fct_pipeline_runs[run_date] )
+			        RETURN DIVIDE ( [Estimated Cost (USD)], days_covered ) * 30
+			```
+		formatString: \$#,0.0000
+		displayFolder: Platform & FinOps
+		lineageTag: c4ccc990-2d7d-58ed-aae9-48d29bf77d7f
+
+	column Value
+		isHidden
+		formatString: 0
+		lineageTag: 7d200551-936b-5d1a-a5c0-80cf15f023ef
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [Value]
+
+		annotation SummarizationSetBy = Automatic
+
+	partition '_Measures' = calculated
+		mode: import
+		source = {0}

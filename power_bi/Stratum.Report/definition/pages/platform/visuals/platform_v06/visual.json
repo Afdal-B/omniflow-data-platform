@@ -1,0 +1,77 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/1.5.0/schema.json",
+  "name": "platform_v06",
+  "position": {
+    "x": 792,
+    "y": 136,
+    "z": 6000,
+    "width": 472,
+    "height": 280,
+    "tabOrder": 6000
+  },
+  "visual": {
+    "visualType": "clusteredBarChart",
+    "query": {
+      "queryState": {
+        "Category": {
+          "projections": [
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "fct_pipeline_rejections"
+                    }
+                  },
+                  "Property": "rejection_reason"
+                }
+              },
+              "queryRef": "fct_pipeline_rejections.rejection_reason",
+              "nativeQueryRef": "rejection_reason"
+            }
+          ]
+        },
+        "Y": {
+          "projections": [
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "_Measures"
+                    }
+                  },
+                  "Property": "Rejected Rows by Rule"
+                }
+              },
+              "queryRef": "_Measures.Rejected Rows by Rule",
+              "nativeQueryRef": "Rejected Rows by Rule"
+            }
+          ]
+        }
+      }
+    },
+    "visualContainerObjects": {
+      "title": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "true"
+                }
+              }
+            },
+            "text": {
+              "expr": {
+                "Literal": {
+                  "Value": "'Rejets par règle qualité'"
+                }
+              }
+            }
+          }
+        }
+      ]
+    }
+  }
+}

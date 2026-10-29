@@ -1,0 +1,21 @@
+{
+  "name": "Stratum",
+  "dataColors": ["#2563EB", "#0EA5A4", "#F59E0B", "#8B5CF6", "#EF4444", "#10B981", "#64748B", "#EC4899"],
+  "foreground": "#0F172A",
+  "foregroundNeutralSecondary": "#475569",
+  "background": "#FFFFFF",
+  "backgroundLight": "#F8FAFC",
+  "tableAccent": "#2563EB",
+  "good": "#10B981",
+  "neutral": "#F59E0B",
+  "bad": "#EF4444",
+  "maximum": "#2563EB",
+  "center": "#E2E8F0",
+  "minimum": "#F8FAFC",
+  "textClasses": {
+    "callout": { "fontFace": "Segoe UI Semibold", "fontSize": 28, "color": "#0F172A" },
+    "title": { "fontFace": "Segoe UI Semibold", "fontSize": 12, "color": "#0F172A" },
+    "header": { "fontFace": "Segoe UI Semibold", "fontSize": 12, "color": "#334155" },
+    "label": { "fontFace": "Segoe UI", "fontSize": 10, "color": "#475569" }
+  }
+}

@@ -1,0 +1,58 @@
+table fct_pipeline_rejections
+	lineageTag: fc33a0fc-4a7f-554a-958e-e6aaf4cc1b12
+
+	column pipeline_name
+		dataType: string
+		lineageTag: 18fe4846-5241-58af-a8e0-73c96644a10d
+		summarizeBy: none
+		sourceColumn: pipeline_name
+
+		annotation SummarizationSetBy = Automatic
+
+	column batch_id
+		dataType: string
+		isHidden
+		lineageTag: 12c692c4-1806-5500-be4e-c4dc456b4eb4
+		summarizeBy: none
+		sourceColumn: batch_id
+
+		annotation SummarizationSetBy = Automatic
+
+	column run_date
+		dataType: dateTime
+		formatString: yyyy-mm-dd
+		lineageTag: 8258d35b-189b-5e5e-9cde-72c5e93f3417
+		summarizeBy: none
+		sourceColumn: run_date
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	column rejection_reason
+		dataType: string
+		lineageTag: 79441dcc-c7d1-5081-a8d5-77eb63801990
+		summarizeBy: none
+		sourceColumn: rejection_reason
+
+		annotation SummarizationSetBy = Automatic
+
+	column rejected_rows
+		dataType: int64
+		formatString: 0
+		lineageTag: 5f2f443a-314b-54e8-b673-51a18c589c25
+		summarizeBy: sum
+		sourceColumn: rejected_rows
+
+		annotation SummarizationSetBy = Automatic
+
+	partition fct_pipeline_rejections = m
+		mode: import
+		source =
+				let
+				    Source = PostgreSQL.Database(WarehouseServer, WarehouseDatabase),
+				    Data = Source{[Schema = "marts", Item = "fct_pipeline_rejections"]}[Data]
+				in
+				    Data
+
+	annotation PBI_ResultType = Table

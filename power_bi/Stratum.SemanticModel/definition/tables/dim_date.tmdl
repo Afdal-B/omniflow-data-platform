@@ -1,0 +1,119 @@
+table dim_date
+	lineageTag: 8569d6f6-df3c-5260-9532-bf9e4e5eb696
+	dataCategory: Time
+
+	column date_day
+		dataType: dateTime
+		isKey
+		formatString: yyyy-mm-dd
+		lineageTag: 832415b5-c6b3-5205-834b-b8c124cc9742
+		summarizeBy: none
+		sourceColumn: date_day
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	column year_number
+		dataType: int64
+		formatString: 0
+		lineageTag: 036dbee8-5bbd-5601-934b-374d6c0160ff
+		summarizeBy: none
+		sourceColumn: year_number
+
+		annotation SummarizationSetBy = Automatic
+
+	column quarter_number
+		dataType: int64
+		formatString: 0
+		lineageTag: 1e854adc-8861-5003-9802-ceaa15ac34f9
+		summarizeBy: none
+		sourceColumn: quarter_number
+
+		annotation SummarizationSetBy = Automatic
+
+	column month_number
+		dataType: int64
+		formatString: 0
+		lineageTag: 758486d1-cbcc-5a3b-85a0-77f534c8713a
+		summarizeBy: none
+		sourceColumn: month_number
+
+		annotation SummarizationSetBy = Automatic
+
+	column month_name
+		dataType: string
+		lineageTag: 05f1261c-eef5-53ff-8f94-29534ed394f2
+		summarizeBy: none
+		sourceColumn: month_name
+		sortByColumn: month_number
+
+		annotation SummarizationSetBy = Automatic
+
+	column day_of_month
+		dataType: int64
+		formatString: 0
+		lineageTag: 188607d5-24c8-578b-aff0-977b9f6a3363
+		summarizeBy: none
+		sourceColumn: day_of_month
+
+		annotation SummarizationSetBy = Automatic
+
+	column iso_day_of_week
+		dataType: int64
+		formatString: 0
+		lineageTag: a7e24837-7082-54db-83dd-73b671f01a2f
+		summarizeBy: none
+		sourceColumn: iso_day_of_week
+
+		annotation SummarizationSetBy = Automatic
+
+	column day_name
+		dataType: string
+		lineageTag: ae84c6a5-2e6b-5472-af31-5f2b08b03fec
+		summarizeBy: none
+		sourceColumn: day_name
+		sortByColumn: iso_day_of_week
+
+		annotation SummarizationSetBy = Automatic
+
+	column week_start_date
+		dataType: dateTime
+		formatString: yyyy-mm-dd
+		lineageTag: 0476e0d7-98ae-5715-b4ba-9fd11b5d531e
+		summarizeBy: none
+		sourceColumn: week_start_date
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	column month_start_date
+		dataType: dateTime
+		formatString: yyyy-mm-dd
+		lineageTag: 95c208ba-86e5-5ebb-a45e-0c3e47be7f53
+		summarizeBy: none
+		sourceColumn: month_start_date
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	column is_weekend
+		dataType: boolean
+		lineageTag: eec7c6f5-a389-554c-b601-a4ce63eaa2df
+		summarizeBy: none
+		sourceColumn: is_weekend
+
+		annotation SummarizationSetBy = Automatic
+
+	partition dim_date = m
+		mode: import
+		source =
+				let
+				    Source = PostgreSQL.Database(WarehouseServer, WarehouseDatabase),
+				    Data = Source{[Schema = "marts", Item = "dim_date"]}[Data]
+				in
+				    Data
+
+	annotation PBI_ResultType = Table

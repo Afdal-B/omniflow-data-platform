@@ -1,0 +1,9 @@
+expression WarehouseServer = "192.168.1.64:5434" meta [IsParameterQuery=true, Type="Text", IsParameterQueryRequired=true]
+	lineageTag: 47515db3-0c54-5412-b237-36a5332c1e22
+
+	annotation PBI_ResultType = Text
+
+expression WarehouseDatabase = "warehouse" meta [IsParameterQuery=true, Type="Text", IsParameterQueryRequired=true]
+	lineageTag: 359c5c7b-0bbc-5c89-a105-d9215ff74df1
+
+	annotation PBI_ResultType = Text

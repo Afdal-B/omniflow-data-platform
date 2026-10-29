@@ -1,0 +1,39 @@
+relationship 52d85bc4-d7a8-5e44-ab73-2e5a9116bd47
+	fromColumn: fct_orders.order_date
+	toColumn: dim_date.date_day
+
+relationship cd7d0fb3-e7bb-5b88-895a-80dc83bc4466
+	fromColumn: fct_order_items.order_date
+	toColumn: dim_date.date_day
+
+relationship 621ee736-a6ed-5f3b-b007-a019cecf06ed
+	fromColumn: fct_sessions.session_date
+	toColumn: dim_date.date_day
+
+relationship 859b3d94-ac2a-57e6-9899-bdff60c7ee23
+	fromColumn: fct_web_traffic_5min.traffic_date
+	toColumn: dim_date.date_day
+
+relationship a95d3e00-f1cf-5591-9bea-80ff1a4cfeed
+	fromColumn: fct_pipeline_runs.run_date
+	toColumn: dim_date.date_day
+
+relationship 171c9396-30d1-5162-a638-bed5b1eb1a54
+	fromColumn: fct_pipeline_rejections.run_date
+	toColumn: dim_date.date_day
+
+relationship dce01246-fcfd-52f6-a221-fa50cf396775
+	fromColumn: fct_orders.customer_id
+	toColumn: dim_customers.customer_id
+
+relationship f15f438b-9e15-5209-85de-f468f3f24a88
+	fromColumn: fct_order_items.customer_id
+	toColumn: dim_customers.customer_id
+
+relationship ccd73bc7-b828-5ab7-97b4-3063a127cab7
+	fromColumn: fct_sessions.customer_id
+	toColumn: dim_customers.customer_id
+
+relationship b90890ba-4038-51e1-a789-c12c697053de
+	fromColumn: fct_order_items.product_id
+	toColumn: dim_products.product_id

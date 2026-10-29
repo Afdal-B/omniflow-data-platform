@@ -1,0 +1,23 @@
+model Model
+	culture: en-US
+	defaultPowerBIDataSourceVersion: powerBI_V3
+	discourageImplicitMeasures
+	sourceQueryCulture: en-US
+	dataAccessOptions
+		legacyRedirects
+		returnErrorValuesAsNull
+
+annotation __PBI_TimeIntelligenceEnabled = 0
+
+annotation PBI_QueryOrder = ["WarehouseServer", "WarehouseDatabase", "dim_customers", "dim_date", "dim_products", "fct_order_items", "fct_orders", "fct_pipeline_rejections", "fct_pipeline_runs", "fct_sessions", "fct_web_traffic_5min"]
+
+ref table dim_customers
+ref table dim_date
+ref table dim_products
+ref table fct_order_items
+ref table fct_orders
+ref table fct_pipeline_rejections
+ref table fct_pipeline_runs
+ref table fct_sessions
+ref table fct_web_traffic_5min
+ref table '_Measures'

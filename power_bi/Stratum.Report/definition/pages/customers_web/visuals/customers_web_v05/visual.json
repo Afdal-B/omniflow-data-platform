@@ -1,0 +1,115 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/1.5.0/schema.json",
+  "name": "customers_web_v05",
+  "position": {
+    "x": 16,
+    "y": 136,
+    "z": 5000,
+    "width": 616,
+    "height": 280,
+    "tabOrder": 5000
+  },
+  "visual": {
+    "visualType": "clusteredBarChart",
+    "query": {
+      "queryState": {
+        "Y": {
+          "projections": [
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "_Measures"
+                    }
+                  },
+                  "Property": "Sessions"
+                }
+              },
+              "queryRef": "_Measures.Sessions",
+              "nativeQueryRef": "Sessions"
+            },
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "_Measures"
+                    }
+                  },
+                  "Property": "Sessions With Product View"
+                }
+              },
+              "queryRef": "_Measures.Sessions With Product View",
+              "nativeQueryRef": "Sessions With Product View"
+            },
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "_Measures"
+                    }
+                  },
+                  "Property": "Sessions With Cart"
+                }
+              },
+              "queryRef": "_Measures.Sessions With Cart",
+              "nativeQueryRef": "Sessions With Cart"
+            },
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "_Measures"
+                    }
+                  },
+                  "Property": "Sessions With Checkout"
+                }
+              },
+              "queryRef": "_Measures.Sessions With Checkout",
+              "nativeQueryRef": "Sessions With Checkout"
+            },
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "_Measures"
+                    }
+                  },
+                  "Property": "Converted Sessions"
+                }
+              },
+              "queryRef": "_Measures.Converted Sessions",
+              "nativeQueryRef": "Converted Sessions"
+            }
+          ]
+        }
+      }
+    },
+    "visualContainerObjects": {
+      "title": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "true"
+                }
+              }
+            },
+            "text": {
+              "expr": {
+                "Literal": {
+                  "Value": "'Entonnoir de conversion'"
+                }
+              }
+            }
+          }
+        }
+      ]
+    }
+  }
+}

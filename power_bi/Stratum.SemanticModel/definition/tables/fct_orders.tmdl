@@ -1,0 +1,137 @@
+table fct_orders
+	lineageTag: 91bc296c-585a-5a4c-af27-a6a858c11d7a
+
+	column order_id
+		dataType: int64
+		formatString: 0
+		lineageTag: 9eae7632-5bbf-57aa-8a38-2846bc390e4b
+		summarizeBy: none
+		sourceColumn: order_id
+
+		annotation SummarizationSetBy = Automatic
+
+	column customer_id
+		dataType: int64
+		formatString: 0
+		lineageTag: 9fae8c74-2bcd-5fc2-9b6a-4a9ef462beed
+		summarizeBy: none
+		sourceColumn: customer_id
+
+		annotation SummarizationSetBy = Automatic
+
+	column order_date
+		dataType: dateTime
+		formatString: yyyy-mm-dd
+		lineageTag: 0ea07419-2e0d-5656-b15d-2a579427a90d
+		summarizeBy: none
+		sourceColumn: order_date
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	column ordered_at
+		dataType: dateTime
+		formatString: yyyy-mm-dd hh:nn:ss
+		lineageTag: bdfbb213-f8f1-5d5b-9ffa-93fdc41d977a
+		summarizeBy: none
+		sourceColumn: ordered_at
+
+		annotation SummarizationSetBy = Automatic
+
+	column order_status
+		dataType: string
+		lineageTag: 23287f03-f82e-5441-9846-c6bf7035543e
+		summarizeBy: none
+		sourceColumn: order_status
+
+		annotation SummarizationSetBy = Automatic
+
+	column channel
+		dataType: string
+		lineageTag: c214be91-4bac-5db9-a6a2-c250c2040e99
+		summarizeBy: none
+		sourceColumn: channel
+
+		annotation SummarizationSetBy = Automatic
+
+	column currency
+		dataType: string
+		lineageTag: 408520de-be14-577d-bc7c-ba0f4b36e64e
+		summarizeBy: none
+		sourceColumn: currency
+
+		annotation SummarizationSetBy = Automatic
+
+	column line_count
+		dataType: int64
+		formatString: 0
+		lineageTag: 7195dec6-71f9-5297-b825-a7cb0904c4fe
+		summarizeBy: sum
+		sourceColumn: line_count
+
+		annotation SummarizationSetBy = Automatic
+
+	column total_quantity
+		dataType: int64
+		formatString: 0
+		lineageTag: 2ba13ef2-076d-5a5a-884d-7ddc11f2dc12
+		summarizeBy: sum
+		sourceColumn: total_quantity
+
+		annotation SummarizationSetBy = Automatic
+
+	column gross_amount
+		dataType: double
+		lineageTag: 1c537e1e-9727-530d-a818-1f0585ced0d9
+		summarizeBy: sum
+		sourceColumn: gross_amount
+
+		annotation SummarizationSetBy = Automatic
+
+	column discount_amount
+		dataType: double
+		lineageTag: 7312960a-70c7-5228-8759-c3244f1c6270
+		summarizeBy: sum
+		sourceColumn: discount_amount
+
+		annotation SummarizationSetBy = Automatic
+
+	column net_amount
+		dataType: double
+		lineageTag: bccb0147-63c0-56b9-9d8b-dbcbacf435af
+		summarizeBy: sum
+		sourceColumn: net_amount
+
+		annotation SummarizationSetBy = Automatic
+
+	column is_revenue
+		dataType: boolean
+		lineageTag: e9256a88-8b9c-5cbf-81b6-b905dc59d723
+		summarizeBy: none
+		sourceColumn: is_revenue
+
+		annotation SummarizationSetBy = Automatic
+
+	column updated_at
+		dataType: dateTime
+		isHidden
+		formatString: yyyy-mm-dd hh:nn:ss
+		lineageTag: 4e127f67-ecd4-5858-812c-74e23f869072
+		summarizeBy: none
+		sourceColumn: updated_at
+
+		annotation SummarizationSetBy = Automatic
+
+	partition fct_orders = m
+		mode: import
+		source =
+				let
+				    Source = PostgreSQL.Database(WarehouseServer, WarehouseDatabase),
+				    Data = Source{[Schema = "marts", Item = "fct_orders"]}[Data],
+				    Numbers = Table.TransformColumnTypes(Data, {{"gross_amount", type number}, {"discount_amount", type number}, {"net_amount", type number}}),
+				    Utc = Table.TransformColumns(Numbers, {{"ordered_at", each if _ = null then null else DateTimeZone.RemoveZone(DateTimeZone.ToUtc(_)), type datetime}, {"updated_at", each if _ = null then null else DateTimeZone.RemoveZone(DateTimeZone.ToUtc(_)), type datetime}})
+				in
+				    Utc
+
+	annotation PBI_ResultType = Table

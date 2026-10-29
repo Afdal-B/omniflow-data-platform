@@ -1,0 +1,73 @@
+table dim_products
+	lineageTag: 4e679131-d6db-53c3-ae30-d16467e7cad7
+
+	column product_id
+		dataType: int64
+		formatString: 0
+		lineageTag: 911ee17c-8ae1-53a6-95c8-85a6e53533c2
+		summarizeBy: none
+		sourceColumn: product_id
+
+		annotation SummarizationSetBy = Automatic
+
+	column sku
+		dataType: string
+		lineageTag: 23bb3c33-2139-55f6-b167-a5ad5f7152c6
+		summarizeBy: none
+		sourceColumn: sku
+
+		annotation SummarizationSetBy = Automatic
+
+	column product_name
+		dataType: string
+		lineageTag: 59b4983f-ae48-5a07-91a2-c6ca5e325719
+		summarizeBy: none
+		sourceColumn: product_name
+
+		annotation SummarizationSetBy = Automatic
+
+	column category
+		dataType: string
+		lineageTag: 86eade83-374c-587f-85fa-c0f97a0affba
+		summarizeBy: none
+		sourceColumn: category
+
+		annotation SummarizationSetBy = Automatic
+
+	column current_unit_price
+		dataType: double
+		lineageTag: f2693938-6546-5e50-beb7-3fe71e7400a0
+		summarizeBy: none
+		sourceColumn: current_unit_price
+
+		annotation SummarizationSetBy = Automatic
+
+	column is_active
+		dataType: boolean
+		lineageTag: db876227-859e-5644-ab18-c84d71983b68
+		summarizeBy: none
+		sourceColumn: is_active
+
+		annotation SummarizationSetBy = Automatic
+
+	column created_at
+		dataType: dateTime
+		formatString: yyyy-mm-dd hh:nn:ss
+		lineageTag: 596f3283-dc25-556d-9324-ac2ebe58027c
+		summarizeBy: none
+		sourceColumn: created_at
+
+		annotation SummarizationSetBy = Automatic
+
+	partition dim_products = m
+		mode: import
+		source =
+				let
+				    Source = PostgreSQL.Database(WarehouseServer, WarehouseDatabase),
+				    Data = Source{[Schema = "marts", Item = "dim_products"]}[Data],
+				    Numbers = Table.TransformColumnTypes(Data, {{"current_unit_price", type number}}),
+				    Utc = Table.TransformColumns(Numbers, {{"created_at", each if _ = null then null else DateTimeZone.RemoveZone(DateTimeZone.ToUtc(_)), type datetime}})
+				in
+				    Utc
+
+	annotation PBI_ResultType = Table

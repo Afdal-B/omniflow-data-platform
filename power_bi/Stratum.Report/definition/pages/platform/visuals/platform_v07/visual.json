@@ -1,0 +1,129 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/1.5.0/schema.json",
+  "name": "platform_v07",
+  "position": {
+    "x": 16,
+    "y": 432,
+    "z": 7000,
+    "width": 1248,
+    "height": 272,
+    "tabOrder": 7000
+  },
+  "visual": {
+    "visualType": "tableEx",
+    "query": {
+      "queryState": {
+        "Values": {
+          "projections": [
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "fct_pipeline_runs"
+                    }
+                  },
+                  "Property": "pipeline_name"
+                }
+              },
+              "queryRef": "fct_pipeline_runs.pipeline_name",
+              "nativeQueryRef": "pipeline_name"
+            },
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "_Measures"
+                    }
+                  },
+                  "Property": "Pipeline Runs"
+                }
+              },
+              "queryRef": "_Measures.Pipeline Runs",
+              "nativeQueryRef": "Pipeline Runs"
+            },
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "_Measures"
+                    }
+                  },
+                  "Property": "Failed Runs"
+                }
+              },
+              "queryRef": "_Measures.Failed Runs",
+              "nativeQueryRef": "Failed Runs"
+            },
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "_Measures"
+                    }
+                  },
+                  "Property": "Avg Run Duration (s)"
+                }
+              },
+              "queryRef": "_Measures.Avg Run Duration (s)",
+              "nativeQueryRef": "Avg Run Duration (s)"
+            },
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "_Measures"
+                    }
+                  },
+                  "Property": "P95 Run Duration (s)"
+                }
+              },
+              "queryRef": "_Measures.P95 Run Duration (s)",
+              "nativeQueryRef": "P95 Run Duration (s)"
+            },
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "_Measures"
+                    }
+                  },
+                  "Property": "Estimated Cost (USD)"
+                }
+              },
+              "queryRef": "_Measures.Estimated Cost (USD)",
+              "nativeQueryRef": "Estimated Cost (USD)"
+            }
+          ]
+        }
+      }
+    },
+    "visualContainerObjects": {
+      "title": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "true"
+                }
+              }
+            },
+            "text": {
+              "expr": {
+                "Literal": {
+                  "Value": "'Performance et coût estimé par pipeline'"
+                }
+              }
+            }
+          }
+        }
+      ]
+    }
+  }
+}
